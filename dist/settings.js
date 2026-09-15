@@ -31,7 +31,7 @@ export function restorePlanSettings(saved, courses, rules) {
     targets: uniqueIds(valid.targets,defaults), completed: uniqueIds(valid.completed), choices, semesterChoices,
     met: [...new Set((Array.isArray(valid.met) ? valid.met : []).filter(label=>externalLabels.has(label)))],
     startYear: [2026,2027,2028,2029,2030].includes(valid.startYear) ? valid.startYear : 2026,
-    capacity: [7.5,10,15,20].includes(valid.capacity) ? valid.capacity : 15,
+    capacity: [7.5,10,15,20,'unlimited'].includes(valid.capacity) ? valid.capacity : 15,
     years: [2,3,4].includes(valid.years) ? valid.years : 2,
     projections: includeFutureOfferings(valid), planningVersion,
   };

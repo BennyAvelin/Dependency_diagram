@@ -6,6 +6,7 @@ import { dependencyPath, makePlan, offeringsFor, parseOffering, validateCatalogu
 import { periodInfo, formatPeriods, formatOffering, periodsForDates } from '../dist/calendar.js';
 import { studyPlanView } from '../dist/plan-view.js';
 import { includeFutureOfferings, planningVersion } from '../dist/settings.js';
+import { assessProgrammePlan } from '../dist/programme.js';
 
 const { courses } = JSON.parse(readFileSync(new URL('../dist/catalogue.json', import.meta.url)));
 const byId = new Map(courses.map(c => [c.id, c]));
@@ -399,4 +400,55 @@ test('published period patterns take precedence over semester-only assumptions',
   assert.match(formatOffering(2026,offerings[0]),/P1 \+ P2/);
   const noNote={...byId.get('1MA038'),outline:byId.get('1MA038').outline.map(o=>({...o,note:''}))};
   assert.deepEqual(offeringsFor(noNote,2026,2,true),[]);
+});
+
+test('the current semester-3 project conflict names the workload and occupying courses', () => {
+  const targets=set('1MA333','1MA325','1MA332','1MA080','1MA337','1MA216','1MA196','1MA038');
+  const done=set('1MA007','1MA362'), path=dependencyPath(targets,done);
+  const plan=makePlan(courses,path,done,{semesterChoices:{'1MA080':3}});
+  const failure=plan.unscheduled.find(c=>c.id==='1MA080');
+  assert.equal(failure.blockerType,'capacity');
+  assert.deepEqual(failure.conflicts.map(c=>[c.period,c.existing,c.required,c.total,c.limit]),[[4,15,15,30,15],[5,15,15,30,15]]);
+  assert.deepEqual(new Set(failure.conflicts.flatMap(c=>c.courseIds)),set('1MA038','1MA259','1MA216'));
+  assert.match(failure.reason,/Analytic Number Theory/);
+  assert.match(failure.reason,/Differential Topology/);
+  assert.match(failure.reason,/Partial Differential Equations/);
+  assert.doesNotMatch(failure.reason,/prerequisite/);
+  const fourth=makePlan(courses,path,done,{semesterChoices:{'1MA080':4}});
+  assert.deepEqual(fourth.scheduled.get('1MA080').periods,[6,7]);
+});
+
+test('chosen semester errors distinguish offerings, prerequisite timing and capacity', () => {
+  const done=set('1MA007'), targets=set('1MA332');
+  const prerequisite=makePlan(courses,dependencyPath(targets,done),done,{semesterChoices:{'1MA036':3,'1MA332':2}}).unscheduled.find(c=>c.id==='1MA332');
+  assert.equal(prerequisite.blockerType,'prerequisite');
+  assert.match(prerequisite.reason,/Modules and Homological Algebra.*must finish before/);
+  const offering=makePlan(courses,dependencyPath(set('1MA080')),new Set(),{projections:false,semesterChoices:{'1MA080':3}}).unscheduled[0];
+  assert.equal(offering.blockerType,'offering');
+  assert.match(offering.reason,/Enable projected future offerings/);
+  const capacity=makePlan(courses,dependencyPath(set('1MA080')),new Set(),{capacity:10,semesterChoices:{'1MA080':3}}).unscheduled[0];
+  assert.equal(capacity.blockerType,'capacity');
+  assert.deepEqual(capacity.conflicts[0].courseIds,[]);
+  assert.match(capacity.reason,/0 already planned \+ 15 for this course = 15 credits \(limit 10\)/);
+});
+
+test('unlimited capacity permits the semester-3 project while retaining workload and programme checks', () => {
+  const targets=set('1MA333','1MA325','1MA332','1MA080','1MA337','1MA216','1MA196','1MA038');
+  const done=set('1MA007','1MA362'), path=dependencyPath(targets,done);
+  const settings={capacity:'unlimited',semesterChoices:{'1MA080':3}};
+  const plan=makePlan(courses,path,done,settings);
+  assert.deepEqual(plan.scheduled.get('1MA080').periods,[4,5]);
+  assert.equal(plan.unscheduled.length,0);
+  assert.ok(plan.loads.every(Number.isFinite));
+  assert.ok(plan.loads.some(load=>load>15));
+  const report=assessProgrammePlan(courses,plan,{completed:done,targets});
+  assert.ok(report.semesters.some(s=>s.overload>0));
+  assert.equal(report.outlineComplete,false);
+  assert.equal(report.degreeStatus,'requires-review');
+  const bounded=makePlan(courses,path,done,{...settings,capacity:15});
+  assert.equal(bounded.scheduled.has('1MA080'),false);
+  const restricted=makePlan(courses,path,done,{...settings,projections:false});
+  assert.equal(restricted.scheduled.has('1MA080'),false);
+  const conflict=makePlan(courses,path,done,{capacity:'unlimited',semesterChoices:{'1MA036':3,'1MA332':2}});
+  assert.equal(conflict.unscheduled.find(c=>c.id==='1MA332').blockerType,'prerequisite');
 });

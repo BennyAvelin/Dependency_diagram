@@ -283,7 +283,7 @@ function renderPlan() {
       const index = semester * 2 + half;
       const period = el('div', 'period');
       const slot = periodInfo(startYear,index);
-      const heading = el('div', 'period-heading'); heading.append(el('strong', '', `P${slot.period}`), el('span', '', `${plan.loads[index]} / ${capacity} cr${semesterReservations.length ? ' (estimated)' : ''}`)); period.append(heading);
+      const heading = el('div', 'period-heading'); heading.append(el('strong', '', `P${slot.period}`), el('span', '', `${plan.loads[index]}${capacity === 'unlimited' ? ' cr · No limit' : ` / ${capacity} cr`}${semesterReservations.length ? ' (estimated)' : ''}`)); period.append(heading);
       period.append(el('p', 'period-dates', slot.start ? `${slot.start} – ${slot.end}` : 'Exact period dates not yet published'));
       let count = 0;
       for (const [id, offering] of plan.scheduled) {
@@ -390,7 +390,7 @@ async function init() {
   $('clear').addEventListener('click', () => { targets.clear(); render(true); });
   $('plan-years').addEventListener('change', event => { years = Number(event.target.value); render(); });
   $('start-year').addEventListener('change', event => { startYear = Number(event.target.value); render(); });
-  $('capacity').addEventListener('change', event => { capacity = Number(event.target.value); render(); });
+  $('capacity').addEventListener('change', event => { capacity = event.target.value === 'unlimited' ? 'unlimited' : Number(event.target.value); render(); });
   $('projections').addEventListener('change', event => { projections = event.target.checked; render(); });
   $('zoom-in').addEventListener('click', () => zoom(1.2)); $('zoom-out').addEventListener('click', () => zoom(1/1.2)); $('fit').addEventListener('click', fit);
   $('export').addEventListener('click', exportPlan);

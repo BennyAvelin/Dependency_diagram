@@ -33,3 +33,7 @@ The degree project now defaults to semester 4. Mathematics in semester 3 require
 ## Follow-up: explicit term notes
 
 The outline was rechecked: Analytic Number Theory and Dynamical Systems now reserve autumn in odd years; Algebraic Topology and Representation Theory reserve spring in even years. Entries display Schedule not yet published, with semester-only placement and estimated capacity allocation. Seven courses still lack a usable explicit term or period pattern: `1MA081`, `1MA181`, `2NE814`, `2NE811`, `1MA344`, `1MA342`, `1MS051`. All 53 Node tests pass, including the 2026-start Analytic Number Theory placement, semester labels, rotations, saved semester constraints, prerequisite order and published-pattern precedence.
+
+## Follow-up: capacity explanation and unlimited option
+
+The browser showed the mathematics project explicitly selected in semester 3 while Analytic Number Theory, Differential Topology and Partial Differential Equations occupied an estimated 15 credits in each period. Adding the project required 30 credits per period against a 15-credit limit. The conflict message now identifies these courses and calculations rather than suggesting a prerequisite problem. Unlimited capacity is now selectable, persists across JSON round trips, and retains programme overload reporting. The 57-test Node suite includes this exact selection, a successful semester-4 alternative, unlimited placement, finite-limit restoration and separate offering/prerequisite failures.

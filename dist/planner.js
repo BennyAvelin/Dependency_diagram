@@ -197,7 +197,8 @@ export function semesterOptions(course, startYear, years = 8, projections = true
 }
 
 export function makePlan(courses, path, completed, { startYear = 2026, years: requestedYears = 2, capacity = 15, projections = true, startPeriod = 1, semesterChoices = {} } = {}) {
-  if (!Number.isInteger(startYear) || !Number.isInteger(requestedYears) || requestedYears < 1 || !Number.isFinite(capacity) || capacity <= 0 || !Number.isInteger(startPeriod) || startPeriod < 1 || startPeriod > 4) throw new Error('Invalid planning settings');
+  if (!Number.isInteger(startYear) || !Number.isInteger(requestedYears) || requestedYears < 1 || (capacity !== 'unlimited' && (!Number.isFinite(capacity) || capacity <= 0)) || !Number.isInteger(startPeriod) || startPeriod < 1 || startPeriod > 4) throw new Error('Invalid planning settings');
+  const capacityLimit = capacity === 'unlimited' ? Infinity : capacity;
   // The chosen window is a minimum. Search further so a prerequisite chain or
   // biennial rotation cannot silently drop a target from the visible plan.
   const years = Math.max(requestedYears, 8);
@@ -221,11 +222,12 @@ export function makePlan(courses, path, completed, { startYear = 2026, years: re
     const options = offeringsFor(course, startYear, years, projections);
     const outlineSemesters = allowedProgrammeSemesters(course);
     const inOutline = o => o.periods.every(period => outlineSemesters.includes(Math.floor(period / 2) + 1));
-    const fits = o => o.periods[0] >= earliestPeriod && (!chosenSemester || o.periods.every(period => Math.floor(period / 2) + 1 === chosenSemester)) &&
-      dependencies.every(e => {
+    const prerequisitesFit = o => dependencies.every(e => {
         const prerequisite = scheduled.get(e.from);
         return prerequisite && (e.kind === 'parallel' ? prerequisite.periods[0] <= o.periods[0] : prerequisite.periods.at(-1) < o.periods[0]);
-      }) && o.periods.every((period, i) => (loads[period] ?? 0) + o.loads[i] <= capacity + .001);
+      });
+    const fits = o => o.periods[0] >= earliestPeriod && (!chosenSemester || o.periods.every(period => Math.floor(period / 2) + 1 === chosenSemester)) &&
+      prerequisitesFit(o) && o.periods.every((period, i) => (loads[period] ?? 0) + o.loads[i] <= capacityLimit + .001);
     const available = options.find(o => inOutline(o) && fits(o)) ?? options.find(fits);
     if (available) {
       scheduled.set(id, { ...available, outsideOutline: !inOutline(available), outlineSemesters, chosenSemester: chosenSemester ?? null, exceptionalProject: course.id === '1MA080' && chosenSemester === 3 });
@@ -235,7 +237,40 @@ export function makePlan(courses, path, completed, { startYear = 2026, years: re
       const availability = options.map(o=>`${formatOffering(startYear,o)}${o.confirmed ? '' : ' (provisional)'}`).join('; ');
       const next = !blocked.length && offeringsFor(course,startYear,years+2,projections).find(o=>o.periods.at(-1)>=years*4 && fits(o));
       const nextOffering = next ? { ...next, requiredYears: Math.floor(next.periods.at(-1)/4)+1 } : null;
-      unscheduled.push({ id, reason: chosenSemester ? `Semester ${chosenSemester} was selected, but no offering fits there with the current prerequisites, offering mode and credit limit. Change the semester choice or adjust the plan; the course has not been moved automatically.`
+      let choiceReason, blockerType, conflicts = [];
+      if (chosenSemester) {
+        const inSemester = options.filter(o=>o.periods.every(p=>Math.floor(p/2)+1===chosenSemester));
+        const afterStart = inSemester.filter(o=>o.periods[0]>=earliestPeriod);
+        const afterPrerequisites = afterStart.filter(prerequisitesFit);
+        if (!inSemester.length) {
+          blockerType = 'offering';
+          choiceReason = `No ${projections ? 'published or provisional' : 'published'} offering is available in this semester.${projections ? '' : ' Enable projected future offerings to include provisional placements.'}`;
+        } else if (!afterStart.length) {
+          blockerType = 'programme-stage';
+          choiceReason = 'This semester is earlier than the permitted project stage or planning start.';
+        } else if (!afterPrerequisites.length) {
+          blockerType = 'prerequisite';
+          const blockers = dependencies.filter(e=>afterStart.every(o=>{
+            const p=scheduled.get(e.from);
+            return !p || (e.kind==='parallel' ? p.periods[0]>o.periods[0] : p.periods.at(-1)>=o.periods[0]);
+          }));
+          choiceReason = `Prerequisite timing does not fit: ${blockers.map(e=>`${byId.get(e.from).title} (${e.kind==='parallel' ? 'must start no later than this course' : 'must finish before this course'})`).join('; ') || 'the required courses cannot all precede the available offering'}.`;
+        } else {
+          blockerType = 'capacity';
+          // Report the closest feasible offering, so multiple patterns do not
+          // produce a misleading conflict from an unrelated course instance.
+          const candidate = afterPrerequisites.toSorted((a,b)=>a.periods.reduce((n,p,i)=>n+Math.max(0,loads[p]+a.loads[i]-capacity),0)-b.periods.reduce((n,p,i)=>n+Math.max(0,loads[p]+b.loads[i]-capacity),0))[0];
+          conflicts = candidate.periods.flatMap((period,index)=>{
+            const required = candidate.loads[index], existing = loads[period];
+            if (existing+required<=capacity+.001) return [];
+            const courseIds = [...scheduled].filter(([,o])=>o.periods.includes(period)).map(([id])=>id);
+            return [{ period, required, existing, total:Number((existing+required).toFixed(2)), limit:capacity, courseIds }];
+          });
+          const occupying = [...new Set(conflicts.flatMap(c=>c.courseIds))].map(id=>byId.get(id).title);
+          choiceReason = `Credit limit exceeded: ${conflicts.map(c=>`P${periodInfo(startYear,c.period).period}: ${c.existing} already planned + ${c.required} for this course = ${c.total} credits (limit ${c.limit})`).join('; ')}.${occupying.length ? ` Already occupying these periods: ${occupying.join(', ')}.` : ''} Move courses to another semester or revise the workload limit. Provisional semester reservations count as estimated workload.`;
+        }
+      }
+      unscheduled.push({ id, blockerType, conflicts, reason: chosenSemester ? `Semester ${chosenSemester} was selected. ${choiceReason} The course has not been moved automatically.`
         : next ? `The next offering after these prerequisites is ${formatOffering(startYear,next)}${next.confirmed ? '' : ' (provisional)'}, outside this ${years}-year window.`
         : !options.length ? 'No offering with known teaching periods in this planning window.'
         : blocked.length ? `First place: ${blocked.join(', ')}.`

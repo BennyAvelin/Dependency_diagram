@@ -26,3 +26,9 @@ test('semester choices survive mode changes and reject corrupt stored values',()
   assert.equal(parsed.projections,false);
   assert.deepEqual(restorePlanSettings({},courses,rules).semesterChoices,{});
 });
+
+test('unlimited capacity survives JSON persistence and corrupt unlimited representations do not',()=>{
+  const saved=restorePlanSettings({capacity:'unlimited'},courses,rules);
+  assert.equal(restorePlanSettings(JSON.parse(JSON.stringify(saved)),courses,rules).capacity,'unlimited');
+  for(const capacity of [null,Infinity,'Infinity','Unlimited']) assert.equal(restorePlanSettings({capacity},courses,rules).capacity,15);
+});
