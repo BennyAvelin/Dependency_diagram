@@ -8,7 +8,7 @@ An interactive prerequisite map and individual study planner for **Uppsala Unive
 2. Select a course in the map or catalogue to inspect its requirements and official sources.
 3. Mark courses **already studied / requirement met** to stop expanding their prerequisites. Only mark a course when your prior study meets its role in the path; a completed-course condition still requires a pass.
 4. Choose a route for requirements with alternatives. Only the chosen route enters the graph. If no choice has been made, a completed alternative is preferred, otherwise the first option is used.
-5. Review the four-semester plan. Change the starting academic year or credit limit. **Projected future offerings are off by default** and are visibly distinguished from published offerings when enabled.
+5. Review the study plan. Change the starting academic year, credit limit or planning window (2–4 academic years). **Provisional future offerings are included by default** and shown with dashed cards. Turn them off to restrict the view to published offerings. If an odd/even rotation falls outside the window, the planner reports the next feasible offering and offers to extend the window.
 6. Review background studies and full entry conditions below the timeline. Download a JSON plan for your records.
 
 Selections are saved in this browser’s local storage. Nothing is sent to a backend. Downloaded plans are records; importing them is not currently supported.
@@ -47,6 +47,8 @@ See [data methodology](docs/data-methodology.md) for how requirements and period
 | `dist/catalogue.json` | Official course facts and source links |
 | `dist/rules.js` | Reviewed prerequisite groups and interpretation notes |
 | `dist/planner.js` | Dependency closure and conditional scheduling |
+| `dist/calendar.js` | Official faculty calendar and shared timeline/period labels |
+| `dist/settings.js` | Planning mode defaults and saved-plan migration |
 | `scripts/import_catalogue.py` | Maintainer-only official data refresh |
 | `test/planner.test.js` | Data and scheduling tests |
 | `.openai/hosting.json` | Private Sites deployment configuration |
@@ -71,7 +73,7 @@ This is an independent planning aid, not a university admissions or degree asses
 - Credit totals, subject distributions, degree requirements, English proficiency, equivalence and approved degree-project plans require individual review. Full official entry wording is retained for each course.
 - Prior participation is scheduled before the dependent course. Concurrent placement is permitted only when explicitly stated. A “participation” edge does not mean that passing is required.
 - The planner places courses greedily in an earliest available period subject to dependencies and the selected credit limit. It is not an optimiser and does not establish that an unplaced course is impossible to schedule.
-- Future projection reuses explicit outline periods and year rotations. It is a scenario assumption, not a promise that a course will run. No exact period is invented for a course listed only by semester.
+- Future projection reuses explicit outline periods, previous published offering patterns and year rotations. It is a scenario assumption, not a promise that a course will run. No exact period is invented for a course listed only by semester without a dated offering or explicit period pattern.
 - Credit loads describe work in the selected path, including any bridging courses. They are **not** eligible degree-credit totals. Additional course choices may be needed for the 120-credit programme.
 - Timetable clashes, admission capacity and special permissions are not checked.
 

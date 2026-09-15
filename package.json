@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "python3 -m http.server 5173 --directory dist --bind 127.0.0.1",
     "test": "node --test",
-    "check": "node --check dist/app.js && node --check dist/planner.js && node --check dist/rules.js && npm test"
+    "check": "node --check dist/app.js && node --check dist/planner.js && node --check dist/calendar.js && node --check dist/settings.js && node --check dist/rules.js && npm test"
   },
   "engines": { "node": ">=22" }
 }

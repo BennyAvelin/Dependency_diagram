@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { rules } from '../dist/rules.js';
 import { dependencyPath, makePlan, offeringsFor, parseOffering, validateCatalogue } from '../dist/planner.js';
+import { periodInfo, formatPeriods, periodsForDates } from '../dist/calendar.js';
+import { includeFutureOfferings, planningVersion } from '../dist/settings.js';
 
 const { courses } = JSON.parse(readFileSync(new URL('../dist/catalogue.json', import.meta.url)));
 const byId = new Map(courses.map(c => [c.id, c]));
@@ -56,16 +58,16 @@ test('explicit parallel requirements fit in the same autumn; prior participation
   assert.deepEqual(plan.scheduled.get('1MA216').periods, [0,1]);
   assert.deepEqual(plan.scheduled.get('1MA338').periods, [2,3]);
   assert.deepEqual(plan.loads, [10,10,5,5,0,0,0,0]);
-  const notDone = makePlan(courses, dependencyPath(set('1MA338')), new Set());
+  const notDone = makePlan(courses, dependencyPath(set('1MA338')), new Set(), { projections: false });
   assert.ok(!notDone.scheduled.has('1MA216'));
 });
-test('projections are opt-in and visibly unconfirmed; past offerings are excluded', () => {
+test('future planning is enabled by default and labelled provisional; published-only mode excludes past dates', () => {
   const path = dependencyPath(set('1MA338'));
-  const plan = makePlan(courses, path, new Set(), { projections: true });
+  const plan = makePlan(courses, path, new Set());
   assert.equal(plan.scheduled.get('1MA362').confirmed, true);
   assert.equal(plan.scheduled.get('1MA216').confirmed, false);
   assert.deepEqual(plan.scheduled.get('1MA338').periods, [6,7]);
-  assert.equal(offeringsFor(byId.get('1MA338'), 2028).length, 0);
+  assert.equal(offeringsFor(byId.get('1MA338'), 2028, 2, false).length, 0);
 });
 test('odd and even rotations use the calendar year of the teaching semester', () => {
   const lie = offeringsFor(byId.get('1MA333'), 2026, 4, true);
@@ -80,13 +82,13 @@ test('unknown teaching periods are not invented even when the semester is known'
   assert.match(plan.unscheduled[0].reason, /No offering/);
 });
 test('published offering dates can add a period not shown in the outline', () => {
-  assert.deepEqual(offeringsFor(byId.get('1RT700'), 2026).map(o => o.periods), [[1],[2]]);
-  assert.deepEqual(offeringsFor(byId.get('2NE831'), 2026)[0].periods, [0]);
+  assert.deepEqual(offeringsFor(byId.get('1RT700'), 2026, 2, false).map(o => o.periods), [[1],[2]]);
+  assert.deepEqual(offeringsFor(byId.get('2NE831'), 2026, 2, false)[0].periods, [0,1]);
 });
 test('credit capacity is enforced in every occupied period without double counting a course', () => {
   const done = set('1MA362');
   const path = dependencyPath(set('1MA338'), done);
-  const plan = makePlan(courses, path, done, { capacity: 7.5 });
+  const plan = makePlan(courses, path, done, { capacity: 7.5, projections: false });
   assert.ok(plan.loads.every(load => load <= 7.5));
   assert.ok(plan.unscheduled.some(c => c.id === '1MA216'));
   assert.equal(plan.scheduled.size, 1);
@@ -97,4 +99,90 @@ test('empty and fully completed target sets generate no study load', () => {
     assert.equal(plan.scheduled.size, 0);
     assert.ok(plan.loads.every(n => n === 0));
   }
+});
+
+test('Lie Algebras uses P4 of odd calendar years and explains the window overflow', () => {
+  const path = dependencyPath(set('1MA332'));
+  const plan = makePlan(courses,path,new Set());
+  assert.deepEqual(plan.scheduled.get('1MA007').periods,[0,1]);
+  assert.deepEqual(plan.scheduled.get('1MA036').periods,[4,5]);
+  assert.equal(plan.scheduled.has('1MA332'),false); // Spring 2028 is not an offering.
+  const overflow = plan.unscheduled.find(c=>c.id==='1MA332');
+  assert.match(overflow.reason,/Spring 2029 · P4/);
+  assert.equal(overflow.nextOffering.requiredYears,3);
+  const extended = makePlan(courses,path,new Set(),{years:3});
+  assert.deepEqual(extended.scheduled.get('1MA332').periods,[11]);
+  assert.equal(extended.scheduled.get('1MA332').confirmed,false);
+  assert.deepEqual(extended.unscheduled,[]);
+});
+
+test('Lie Algebras fits Spring 2027 P4 when Algebraic Structures is already met', () => {
+  const completed = set('1MA007');
+  const plan = makePlan(courses,dependencyPath(set('1MA332'),completed),completed);
+  assert.deepEqual(plan.scheduled.get('1MA036').periods,[0,1]);
+  assert.deepEqual(plan.scheduled.get('1MA332').periods,[3]);
+  assert.equal(plan.scheduled.get('1MA332').confirmed,true);
+  assert.equal(formatPeriods(2026,[3]),'Spring 2027 · P4');
+  assert.equal(periodInfo(2026,3).semester,2);
+});
+
+test('all published course date ranges agree with the checked faculty calendar', () => {
+  const expected = {
+    '31 August 2026–1 November 2026': [0],
+    '31 August 2026–17 January 2027': [0,1],
+    '2 November 2026–17 January 2027': [1],
+    '18 January 2027–21 March 2027': [2],
+    '18 January 2027–6 June 2027': [2,3],
+    '22 March 2027–6 June 2027': [3],
+    // Economics ends two days into Science & Technology P2; no silent truncation.
+    '31 August 2026–3 November 2026': [0,1],
+  };
+  for (const c of courses) {
+    const mapped = offeringsFor(c,2026,2,false);
+    assert.equal(mapped.length,c.offerings.length,`${c.id}: every published offering must map`);
+    for (const o of mapped) {
+      assert.deepEqual(o.periods,expected[o.dates],`${c.id}: ${o.dates}`);
+      assert.ok(Math.abs(o.loads.reduce((a,b)=>a+b,0)-c.credits)<.001);
+    }
+  }
+});
+
+test('January boundaries are academic-year specific, including Spring 2028', () => {
+  const c = { ...byId.get('1MA338'), offerings: [{dates:'17 January 2028–4 June 2028'}] };
+  const o = offeringsFor(c,2026,2,false)[0];
+  assert.deepEqual(o.periods,[6,7]); // Never P2 / autumn 2027.
+  assert.deepEqual(o.loads,[5,5]);
+  assert.equal(formatPeriods(2026,o.periods),'Spring 2028 · P3 + P4');
+  assert.deepEqual(periodsForDates({start:'2027-01-18',end:'2027-01-31'}).map(p=>p.period),[3]);
+  assert.deepEqual(periodInfo(2026,6).semesterDates,['2028-01-17','2028-06-04']);
+  assert.equal(periodInfo(2026,6).start,null); // No invented 2027/28 faculty boundary.
+});
+
+test('exact half-semester boundaries map to the same labels as the timeline', () => {
+  for (const [date,period] of [['2026-11-01',1],['2026-11-02',2],['2027-01-17',2],['2027-01-18',3],['2027-03-21',3],['2027-03-22',4]]) {
+    const slots = periodsForDates({start:date,end:date});
+    assert.equal(slots.length,1);
+    assert.equal(slots[0].period,period);
+    assert.equal(periodInfo(2026,period-1).period,period);
+  }
+  assert.deepEqual(periodsForDates({start:'2027-06-06',end:'2027-06-20'}),[]);
+  assert.equal(parseOffering('31 February 2027–2 March 2027'),null);
+  assert.equal(parseOffering('2 March 2027–1 March 2027'),null);
+});
+
+test('future planning preserves multiple offering patterns and fills courses without an outline grid', () => {
+  const repeated = offeringsFor(byId.get('1RT700'),2026,2,true);
+  assert.deepEqual(repeated.map(o=>o.periods),[[1],[2],[5],[6]]);
+  assert.equal(repeated.at(-1).confirmed,false);
+  const hpp = offeringsFor(byId.get('1TD062'),2027,2,true);
+  assert.deepEqual(hpp[0].periods,[2]);
+  assert.equal(hpp[0].source,'Previous published offering');
+  assert.equal(offeringsFor(byId.get('1MA336'),2026,3,true).length,0);
+});
+
+test('existing saved plans migrate the broken default but preserve subsequent published-only choices', () => {
+  assert.equal(includeFutureOfferings(),true);
+  assert.equal(includeFutureOfferings({projections:false}),true);
+  assert.equal(includeFutureOfferings({planningVersion,projections:false}),false);
+  assert.equal(includeFutureOfferings({planningVersion,projections:true}),true);
 });

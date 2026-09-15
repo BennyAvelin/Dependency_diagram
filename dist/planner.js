@@ -1,4 +1,5 @@
 import { rules } from './rules.js';
+import { periodsForDates, formatPeriods } from './calendar.js';
 
 export function validateCatalogue(courses, ruleSet = rules) {
   const byId = new Map();
@@ -54,60 +55,73 @@ export function dependencyPath(targets, completed = new Set(), choices = {}, rul
 
 const months = { January: 1, February: 2, March: 3, April: 4, May: 5, June: 6, July: 7, August: 8, September: 9, October: 10, November: 11, December: 12 };
 export function parseOffering(dates) {
-  const m = dates.match(/(\d+) (\w+) (\d{4})[–-](\d+) (\w+) (\d{4})/);
+  const m = dates.replace(/\s+/g,' ').trim().match(/^(\d+) (\w+) (\d{4})\s*[–-]\s*(\d+) (\w+) (\d{4})$/);
   if (!m || !months[m[2]] || !months[m[5]]) return null;
   const start = `${m[3]}-${String(months[m[2]]).padStart(2, '0')}-${m[1].padStart(2, '0')}`;
   const end = `${m[6]}-${String(months[m[5]]).padStart(2, '0')}-${m[4].padStart(2, '0')}`;
+  if (start > end || [start,end].some(d => !Number.isFinite(Date.parse(d)) || new Date(d).toISOString().slice(0,10) !== d)) return null;
   return { start, end };
 }
 
-// Academic-year slots: P1 autumn first half; P2 autumn second half;
-// P3 spring first half; P4 spring second half. Exact course dates remain visible.
-function dateSlot(iso, end = false) {
-  const [year, month, day] = iso.split('-').map(Number);
-  if (month >= 8 && month <= 10) return { year, period: 1 };
-  if (month >= 11) return { year, period: end && month === 11 && day <= 7 ? 1 : 2 };
-  if (month === 1 && (end || day < 18)) return { year: year - 1, period: 2 };
-  if (month < 3 || (month === 3 && day < 22)) return { year: year - 1, period: 3 };
-  return { year: year - 1, period: 4 };
-}
-
-export function offeringsFor(course, startYear, years = 2, projections = false) {
+function publishedOfferings(course) {
   const results = [];
   for (const raw of course.offerings ?? []) {
     const dates = parseOffering(raw.dates);
     if (!dates) continue;
-    const start = dateSlot(dates.start), end = dateSlot(dates.end, true);
-    const first = (start.year - startYear) * 4 + start.period - 1;
-    const last = (end.year - startYear) * 4 + end.period - 1;
-    if (first < 0 || last >= years * 4 || last < first) continue;
-    const periods = Array.from({ length: last - first + 1 }, (_, i) => first + i);
-    const outline = course.outline.find(o => o.periods?.length && o.periods.map(p => p.period).join() === periods.map(p => p % 4 + 1).join());
-    const loads = outline && Math.abs(outline.periods.reduce((sum, p) => sum + p.credits, 0) - course.credits) < .01 ? outline.periods.map(p => p.credits) : periods.map(() => course.credits / periods.length);
-    results.push({ periods, loads, confirmed: true, dates: raw.dates, source: course.source });
+    const slots = periodsForDates(dates);
+    if (!slots.length) continue;
+    const periods = slots.map(p => p.period);
+    const outline = course.outline.find(o => o.periods?.map(p => p.period).join() === periods.join());
+    const matchesOutline = outline && Math.abs(outline.periods.reduce((n,p) => n+p.credits,0)-course.credits)<.01;
+    const days = slots.reduce((n,p) => n+(p.days ?? 0),0);
+    const loads = matchesOutline ? outline.periods.map(p=>p.credits)
+      : slots.map(p => Number((course.credits * (days ? p.days/days : 1/slots.length)).toFixed(2)));
+    loads[loads.length-1] = Number((course.credits-loads.slice(0,-1).reduce((n,p)=>n+p,0)).toFixed(2));
+    results.push({ slots, loads, confirmed: true, dates: raw.dates, source: course.source,
+      loadBasis: matchesOutline ? 'Outline credit split' : 'Estimated workload from the published date range' });
+  }
+  return results;
+}
+
+export function offeringsFor(course, startYear, years = 2, projections = true) {
+  const results = [];
+  const published = publishedOfferings(course);
+  for (const offering of published) {
+    const { slots, ...details } = offering;
+    const periods = slots.map(p=>(p.academicYear-startYear)*4+p.period-1);
+    if (periods[0]<0 || periods.at(-1)>=years*4) continue;
+    results.push({ ...details, periods });
   }
   if (projections) {
-    const outline = course.outline.find(o => o.periods?.length);
     const notes = course.outline.map(o => o.note).join(' ');
-    const explicitPeriod = notes.match(/period (\d)/i);
-    // No invented within-semester placement: unknown periods stay unscheduled.
-    const pattern = outline?.periods ?? (explicitPeriod ? [{ period: Number(explicitPeriod[1]), credits: course.credits }] : []);
-    for (let offset = 0; offset < years && pattern.length; offset++) {
+    const patterns = new Map();
+    const addPattern = (periods,loads,basis) => {
+      if (periods.length && !patterns.has(periods.join())) patterns.set(periods.join(),{ periods,loads,basis });
+    };
+    for (const o of course.outline) if (o.periods?.length) addPattern(o.periods.map(p=>p.period),o.periods.map(p=>p.credits),'Programme outline');
+    const explicitPeriod = notes.match(/period ([1-4])/i);
+    if (!patterns.size && explicitPeriod) addPattern([Number(explicitPeriod[1])],[course.credits],'Programme outline');
+    // Retain every known pattern, including spring repeats and courses without
+    // a period grid in the outline. Repeating published patterns is provisional.
+    for (const o of published) if (o.slots.every(p=>p.academicYear===o.slots[0].academicYear)) {
+      addPattern(o.slots.map(p=>p.period),o.loads,'Previous published offering');
+    }
+    for (let offset = 0; offset < years; offset++) for (const pattern of patterns.values()) {
       const year = startYear + offset;
-      const calendarYear = year + (pattern[0].period >= 3 ? 1 : 0);
+      const calendarYear = year + (pattern.periods[0] >= 3 ? 1 : 0);
       if (/even years/i.test(notes) && calendarYear % 2 !== 0) continue;
       if (/odd years/i.test(notes) && calendarYear % 2 !== 1) continue;
-      const periods = pattern.map(p => offset * 4 + p.period - 1);
+      const periods = pattern.periods.map(p => offset * 4 + p - 1);
       // Do not project a different placement over a published offering in that term.
-      if (results.some(o => Math.floor(o.periods[0] / 2) === Math.floor(periods[0] / 2))) continue;
-      results.push({ periods, loads: pattern.map(p => p.credits), confirmed: false, dates: 'Projected from the programme outline; offering not confirmed', source: 'outline' });
+      if (results.some(o => o.confirmed && Math.floor(o.periods[0] / 2) === Math.floor(periods[0] / 2))) continue;
+      results.push({ periods, loads: pattern.loads, confirmed: false, dates: 'Future offering not yet confirmed', source: pattern.basis, loadBasis: `${pattern.basis} pattern; provisional` });
     }
   }
   return results.sort((a, b) => a.periods[0] - b.periods[0]);
 }
 
-export function makePlan(courses, path, completed, { startYear = 2026, years = 2, capacity = 15, projections = false, startPeriod = 1 } = {}) {
-  if (!Number.isInteger(startYear) || years < 1 || capacity <= 0 || startPeriod < 1 || startPeriod > 4) throw new Error('Invalid planning settings');
+export function makePlan(courses, path, completed, { startYear = 2026, years = 2, capacity = 15, projections = true, startPeriod = 1 } = {}) {
+  if (!Number.isInteger(startYear) || !Number.isInteger(years) || years < 1 || !Number.isFinite(capacity) || capacity <= 0 || !Number.isInteger(startPeriod) || startPeriod < 1 || startPeriod > 4) throw new Error('Invalid planning settings');
   const byId = new Map(courses.map(c => [c.id, c]));
   const loads = Array(years * 4).fill(0), scheduled = new Map(), unscheduled = [];
   const ids = [...path.included].filter(id => !completed.has(id)).sort((a, b) => path.levels.get(a) - path.levels.get(b) || a.localeCompare(b));
@@ -115,15 +129,25 @@ export function makePlan(courses, path, completed, { startYear = 2026, years = 2
     const course = byId.get(id);
     const dependencies = path.edges.filter(e => e.to === id && !completed.has(e.from));
     const options = offeringsFor(course, startYear, years, projections);
-    const available = options.find(o => o.periods[0] >= startPeriod - 1 &&
+    const fits = o => o.periods[0] >= startPeriod - 1 &&
       dependencies.every(e => {
         const prerequisite = scheduled.get(e.from);
         return prerequisite && (e.kind === 'parallel' ? prerequisite.periods[0] <= o.periods[0] : prerequisite.periods.at(-1) < o.periods[0]);
-      }) && o.periods.every((period, i) => loads[period] + o.loads[i] <= capacity + .001));
+      }) && o.periods.every((period, i) => (loads[period] ?? 0) + o.loads[i] <= capacity + .001);
+    const available = options.find(fits);
     if (available) {
       scheduled.set(id, available);
-      available.periods.forEach((period, i) => { loads[period] += available.loads[i]; });
-    } else unscheduled.push({ id, reason: !options.length ? 'No offering with known teaching periods in this planning window.' : dependencies.some(e => !scheduled.has(e.from)) ? 'A prerequisite could not be placed.' : 'Published/projected periods do not fit after prerequisites within the chosen credit limit.' });
+      available.periods.forEach((period, i) => { loads[period] = Number((loads[period]+available.loads[i]).toFixed(2)); });
+    } else {
+      const blocked = dependencies.filter(e=>!scheduled.has(e.from)).map(e=>byId.get(e.from).title);
+      const availability = options.map(o=>`${formatPeriods(startYear,o.periods)}${o.confirmed ? '' : ' (provisional)'}`).join('; ');
+      const next = !blocked.length && offeringsFor(course,startYear,years+2,projections).find(o=>o.periods.at(-1)>=years*4 && fits(o));
+      const nextOffering = next ? { ...next, requiredYears: Math.floor(next.periods.at(-1)/4)+1 } : null;
+      unscheduled.push({ id, reason: next ? `The next offering after these prerequisites is ${formatPeriods(startYear,next.periods)}${next.confirmed ? '' : ' (provisional)'}, outside this ${years}-year window.`
+        : !options.length ? 'No offering with known teaching periods in this planning window.'
+        : blocked.length ? `First place: ${blocked.join(', ')}.`
+        : 'The available periods do not fit after prerequisites within the chosen credit limit.', availability, nextOffering });
+    }
   }
   return { scheduled, unscheduled, loads };
 }
