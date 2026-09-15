@@ -1,6 +1,6 @@
 import { rules, ruleNotes } from './rules.js';
 import { validateCatalogue, dependencyPath, makePlan, offeringsFor, degreeProjectWindow, semesterOptions } from './planner.js';
-import { periodInfo, formatPeriods, periodSource } from './calendar.js';
+import { periodInfo, formatOffering, periodSource } from './calendar.js';
 import { planningVersion, restorePlanSettings } from './settings.js';
 import { studyPlanView } from './plan-view.js';
 import { assessProgrammePlan } from './programme.js';
@@ -46,9 +46,9 @@ function setCompleted(id, enabled) { enabled ? completed.add(id) : completed.del
 function optionLabel(option) { return option.course ? `${byId.get(option.course).title} (${option.course})` : option.external; }
 function offeringLabel(c) {
   const planned = plan?.scheduled.get(c.id);
-  if (planned) return formatPeriods(startYear,planned.periods);
+  if (planned) return formatOffering(startYear,planned);
   const available = offeringsFor(c,startYear,plan.years,projections);
-  return available.length ? formatPeriods(startYear,available[0].periods) : 'Period to be confirmed';
+  return available.length ? formatOffering(startYear,available[0]) : 'Period to be confirmed';
 }
 function sourceLink(url, title) { const a = el('a', 'source-link', title); a.href = url; a.target = '_blank'; a.rel = 'noreferrer'; return a; }
 
@@ -62,7 +62,7 @@ function semesterControl(course, location) {
   const automatic = el('option', '', degreeProjectWindow(course) ? 'Automatic · Semester 4 (final semester)' : 'Automatic · Follow programme outline'); automatic.value = ''; select.append(automatic);
   for (const option of options) {
     const info = periodInfo(startYear, (option.semester - 1) * 2);
-    const item = el('option', '', `Semester ${option.semester} · ${info.term} ${info.year}${option.exceptional ? ' · Exceptional' : ''}${option.outsideOutline ? ' · Outside outline' : ''}${option.confirmed ? '' : ' · Provisional'}`);
+    const item = el('option', '', `Semester ${option.semester} · ${info.term} ${info.year}${option.exceptional ? ' · Exceptional' : ''}${option.outsideOutline ? ' · Outside outline' : ''}${option.semesterOnly ? ' · Schedule not yet published' : option.confirmed ? '' : ' · Provisional'}`);
     item.value = option.semester; select.append(item);
   }
   if (chosen && !options.some(option => option.semester === chosen)) {
@@ -153,7 +153,7 @@ function renderDetails() {
   for (const o of available) {
     const isPlaced = placed?.periods.join() === o.periods.join();
     const item = el('div', 'course-offering');
-    item.append(el('strong', '', formatPeriods(startYear,o.periods)), el('p', 'empty-note', `${isPlaced ? 'In your study plan · ' : ''}${o.confirmed ? o.dates : 'Provisional future offering'}`), el('small', 'empty-note', o.loadBasis));
+    item.append(el('strong', '', formatOffering(startYear,o)), el('p', 'empty-note', `${isPlaced ? 'In your study plan · ' : ''}${o.semesterOnly ? 'Schedule not yet published · Semester from outline' : o.confirmed ? o.dates : 'Provisional future offering'}`), el('small', 'empty-note', o.loadBasis));
     if (projectWindow && o.periods[0] < projectWindow.earliestPeriod) item.append(el('p', 'empty-note', `Published for an earlier programme stage; this plan starts the project in semester ${projectWindow.semesters[0]} or later.`));
     container.append(item);
   }
@@ -263,15 +263,31 @@ function renderPlan() {
     const column = el('section', `semester${info.beyondProgramme ? ' extended-semester' : ''}`);
     column.append(el('h3', '', `${info.term} ${info.year}`), el('p', 'semester-subtitle', `Semester ${info.semester} · ${info.semesterDates.join(' – ')}${info.semesterDatesPublished ? '' : ' (calculated)'}`));
     if (info.beyondProgramme) column.append(el('p', 'extension-label', 'Beyond the standard 2-year programme'));
+    const semesterReservations = [...plan.scheduled].filter(([, offering]) => offering.semesterOnly && Math.floor(offering.periods[0]/2) === semester);
+    if (semesterReservations.length) {
+      const pending = el('div', 'semester-reservations');
+      pending.append(el('h4', '', 'Schedule not yet published'));
+      for (const [id, offering] of semesterReservations) {
+        projectedCount++;
+        const item = button('', 'plan-course projected', () => { selectCourse(id); $('details').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
+        item.id = `plan-${id}`;
+        item.append(el('small', '', `${id} · ${byId.get(id).credits} cr this semester`), el('strong', '', byId.get(id).title), el('span', '', 'Semester from outline · Exact periods not yet planned'));
+        if (offering.chosenSemester) item.append(el('span', '', `Your choice: semester ${offering.chosenSemester}`));
+        if (offering.outsideOutline) item.append(el('span', 'outline-warning', 'Outside listed programme semester · Review required'));
+        pending.append(item);
+      }
+      pending.append(el('p', 'empty-note', 'Workload is temporarily split equally across the semester for capacity estimates. Confirm the teaching periods before finalising your plan.'));
+      column.append(pending);
+    }
     for (let half = 0; half < 2; half++) {
       const index = semester * 2 + half;
       const period = el('div', 'period');
       const slot = periodInfo(startYear,index);
-      const heading = el('div', 'period-heading'); heading.append(el('strong', '', `P${slot.period}`), el('span', '', `${plan.loads[index]} / ${capacity} cr`)); period.append(heading);
+      const heading = el('div', 'period-heading'); heading.append(el('strong', '', `P${slot.period}`), el('span', '', `${plan.loads[index]} / ${capacity} cr${semesterReservations.length ? ' (estimated)' : ''}`)); period.append(heading);
       period.append(el('p', 'period-dates', slot.start ? `${slot.start} – ${slot.end}` : 'Exact period dates not yet published'));
       let count = 0;
       for (const [id, offering] of plan.scheduled) {
-        const position = offering.periods.indexOf(index); if (position === -1) continue;
+        const position = offering.periods.indexOf(index); if (position === -1 || offering.semesterOnly) continue;
         count++;
         if (!offering.confirmed && position === 0) projectedCount++;
         const item = button('', `plan-course${offering.confirmed ? '' : ' projected'}${targets.has(id) ? ' plan-target' : ''}`, () => { selectCourse(id); $('details').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
@@ -280,9 +296,9 @@ function renderPlan() {
         if (offering.exceptionalProject) item.append(el('span', 'outline-warning', 'Semester 3 exception · Adviser review needed'));
         if (offering.chosenSemester) item.append(el('span', '', `Your choice: semester ${offering.chosenSemester}`));
         if (offering.outsideOutline) item.append(el('span', 'outline-warning', `Outside outline semester ${offering.outlineSemesters.join(' / ')} · Review required`));
-        item.title = `${formatPeriods(startYear,offering.periods)} · ${offering.dates} · ${offering.loadBasis}`; period.append(item);
+        item.title = `${formatOffering(startYear,offering)} · ${offering.dates} · ${offering.loadBasis}`; period.append(item);
       }
-      if (!count) period.append(el('p', 'empty-period', 'No selected course scheduled in this period'));
+      if (!count) period.append(el('p', 'empty-period', semesterReservations.length ? 'Semester reservations above have no exact period yet' : 'No selected course scheduled in this period'));
       column.append(period);
     }
     timeline.append(column);
@@ -346,7 +362,7 @@ function render(refit = false) {
   renderTargets(); renderCatalogue(); renderDetails(); renderMap(refit); renderPlan(); save(); restoreFocus(focusId);
 }
 function exportPlan() {
-  const payload = { format: 'uppsala-course-atlas-plan-v2', generatedAt: new Date().toISOString(), outline: catalogue.outlineSource, periodSource, sourceCheckedOn: catalogue.checkedOn, targets: [...targets], alreadyStudied: [...completed], choices, semesterChoices, backgroundMarkedMet: [...met], settings: { startYear, capacity, projections, years, displayedYears: plan.years, searchYears: plan.searchYears }, targetOutcomes: studyPlanView(plan, targets, completed, startYear).targets, scheduled: [...plan.scheduled].map(([id,o]) => ({ id, title: byId.get(id).title, ...o, periods: o.periods.map(p => periodInfo(startYear,p)) })), unplaced: plan.unscheduled, note: 'A conditional planning suggestion, not an admission or degree assessment. Formal eligibility, future offerings and timetable conflicts require review.' };
+  const payload = { format: 'uppsala-course-atlas-plan-v2', generatedAt: new Date().toISOString(), outline: catalogue.outlineSource, periodSource, sourceCheckedOn: catalogue.checkedOn, targets: [...targets], alreadyStudied: [...completed], choices, semesterChoices, backgroundMarkedMet: [...met], settings: { startYear, capacity, projections, years, displayedYears: plan.years, searchYears: plan.searchYears }, targetOutcomes: studyPlanView(plan, targets, completed, startYear).targets, scheduled: [...plan.scheduled].map(([id,o]) => ({ id, title: byId.get(id).title, ...o, periods: o.periods.map(p => ({ ...periodInfo(startYear,p), ...(o.semesterOnly ? { estimatedReservation: true, start: null, end: null } : {}) })) })), unplaced: plan.unscheduled, note: 'A conditional planning suggestion, not an admission or degree assessment. Formal eligibility, future offerings and timetable conflicts require review.' };
   payload.programmeAssessment = assessProgrammePlan(courses, plan, { completed, targets });
   const url = URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)], { type: 'application/json' }));
   const a = el('a'); a.href = url; a.download = 'uppsala-mathematics-study-plan.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url),1000);

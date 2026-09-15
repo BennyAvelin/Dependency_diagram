@@ -1,5 +1,5 @@
 import { rules } from './rules.js';
-import { periodsForDates, formatPeriods, periodInfo } from './calendar.js';
+import { periodsForDates, formatPeriods, formatOffering, periodInfo } from './calendar.js';
 import { allowedProgrammeSemesters } from './programme.js';
 
 export function validateCatalogue(courses, ruleSet = rules) {
@@ -144,8 +144,8 @@ export function offeringsFor(course, startYear, years = 2, projections = true) {
   if (projections) {
     const notes = course.outline.map(o => o.note).join(' ');
     const patterns = new Map();
-    const addPattern = (periods,loads,basis) => {
-      if (periods.length && !patterns.has(periods.join())) patterns.set(periods.join(),{ periods,loads,basis });
+    const addPattern = (periods,loads,basis, semesterOnly = false) => {
+      if (periods.length && !patterns.has(periods.join())) patterns.set(periods.join(),{ periods,loads,basis,semesterOnly });
     };
     for (const o of course.outline) if (o.periods?.length) addPattern(o.periods.map(p=>p.period),o.periods.map(p=>p.credits),'Programme outline');
     for (const semester of projectWindow?.semesters ?? []) {
@@ -159,6 +159,15 @@ export function offeringsFor(course, startYear, years = 2, projections = true) {
     for (const o of published) if (o.slots.every(p=>p.academicYear===o.slots[0].academicYear)) {
       addPattern(o.slots.map(p=>p.period),o.loads,'Previous published offering');
     }
+    // An explicit term in the outline supports a semester reservation even
+    // without a published period grid. Two equal loads are only an estimate;
+    // render this once at semester level, never as known P1/P2 or P3/P4 study.
+    if (!patterns.size) {
+      for (const match of notes.matchAll(/\b(fall|autumn|spring)\s+semester\b/gi)) {
+        const first = /spring/i.test(match[1]) ? 3 : 1;
+        addPattern([first,first+1],[course.credits/2,course.credits/2],'Outline semester note; period workload estimated equally, exact teaching periods not yet planned',true);
+      }
+    }
     for (let offset = 0; offset < years; offset++) for (const pattern of patterns.values()) {
       const year = startYear + offset;
       const calendarYear = year + (pattern.periods[0] >= 3 ? 1 : 0);
@@ -168,7 +177,7 @@ export function offeringsFor(course, startYear, years = 2, projections = true) {
       if (projectWindow && periods[0] < projectWindow.earliestPeriod) continue;
       // Do not project a different placement over a published offering in that term.
       if (results.some(o => o.confirmed && Math.floor(o.periods[0] / 2) === Math.floor(periods[0] / 2))) continue;
-      results.push({ periods, loads: pattern.loads, confirmed: false, dates: 'Future offering not yet confirmed', source: pattern.basis, loadBasis: `${pattern.basis} pattern; provisional` });
+      results.push({ periods, loads: pattern.loads, confirmed: false, semesterOnly: pattern.semesterOnly, dates: pattern.semesterOnly ? 'Schedule not yet published; semester from programme outline' : 'Future offering not yet confirmed', source: pattern.basis, loadBasis: `${pattern.basis} pattern; provisional` });
     }
   }
   return results.sort((a, b) => a.periods[0] - b.periods[0]);
@@ -182,7 +191,7 @@ export function semesterOptions(course, startYear, years = 8, projections = true
     if (offering.periods[0] < earliest) continue;
     const semester = Math.floor(offering.periods[0] / 2) + 1;
     const existing = semesters.get(semester);
-    semesters.set(semester, { semester, confirmed: Boolean(existing?.confirmed || offering.confirmed), outsideOutline: !allowed.includes(semester), exceptional: course.id === '1MA080' && semester === 3 });
+    semesters.set(semester, { semester, confirmed: Boolean(existing?.confirmed || offering.confirmed), semesterOnly: existing ? existing.semesterOnly && offering.semesterOnly : Boolean(offering.semesterOnly), outsideOutline: !allowed.includes(semester), exceptional: course.id === '1MA080' && semester === 3 });
   }
   return [...semesters.values()];
 }
@@ -223,7 +232,7 @@ export function makePlan(courses, path, completed, { startYear = 2026, years: re
       available.periods.forEach((period, i) => { loads[period] = Number((loads[period]+available.loads[i]).toFixed(2)); });
     } else {
       const blocked = dependencies.filter(e=>!scheduled.has(e.from)).map(e=>byId.get(e.from).title);
-      const availability = options.map(o=>`${formatPeriods(startYear,o.periods)}${o.confirmed ? '' : ' (provisional)'}`).join('; ');
+      const availability = options.map(o=>`${formatOffering(startYear,o)}${o.confirmed ? '' : ' (provisional)'}`).join('; ');
       const next = !blocked.length && offeringsFor(course,startYear,years+2,projections).find(o=>o.periods.at(-1)>=years*4 && fits(o));
       const nextOffering = next ? { ...next, requiredYears: Math.floor(next.periods.at(-1)/4)+1 } : null;
       unscheduled.push({ id, reason: chosenSemester ? `Semester ${chosenSemester} was selected, but no offering fits there with the current prerequisites, offering mode and credit limit. Change the semester choice or adjust the plan; the course has not been moved automatically.`

@@ -65,3 +65,9 @@ export function periodsForDates({ start, end }) {
   // Never silently truncate a summer course or a range with unknown boundaries.
   return coveredDays === Math.round((Date.parse(end)-Date.parse(start))/dayMs)+1 ? result : [];
 }
+// Semester reservations do not assert exact teaching periods.
+export function formatOffering(startYear, offering) {
+  if (!offering.semesterOnly) return formatPeriods(startYear, offering.periods);
+  const info = periodInfo(startYear, offering.periods[0]);
+  return `${info.term} ${info.year} · Periods not yet planned`;
+}

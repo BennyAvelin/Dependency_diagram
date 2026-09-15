@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { rules } from '../dist/rules.js';
 import { dependencyPath, makePlan, offeringsFor, parseOffering, validateCatalogue, semesterOptions } from '../dist/planner.js';
-import { periodInfo, formatPeriods, periodsForDates } from '../dist/calendar.js';
+import { periodInfo, formatPeriods, formatOffering, periodsForDates } from '../dist/calendar.js';
 import { studyPlanView } from '../dist/plan-view.js';
 import { includeFutureOfferings, planningVersion } from '../dist/settings.js';
 
@@ -77,8 +77,8 @@ test('odd and even rotations use the calendar year of the teaching semester', ()
   assert.deepEqual(analytic.map(o => o.periods), [[0,1],[8,9]]); // autumn 2026 and 2028
 });
 test('unknown teaching periods are not invented even when the semester is known', () => {
-  assert.deepEqual(offeringsFor(byId.get('1MA336'), 2026, 4, true), []);
-  const path = dependencyPath(set('1MA336'), set('1MA259', '1MA036'));
+  assert.deepEqual(offeringsFor(byId.get('1MA344'), 2026, 4, true), []);
+  const path = dependencyPath(set('1MA344'), set('1MA259', '1MA036'));
   const plan = makePlan(courses, path, set('1MA259', '1MA036'), { projections: true });
   assert.match(plan.unscheduled[0].reason, /No offering/);
 });
@@ -184,7 +184,7 @@ test('future planning preserves multiple offering patterns and fills courses wit
   const hpp = offeringsFor(byId.get('1TD062'),2027,2,true);
   assert.deepEqual(hpp[0].periods,[2]);
   assert.equal(hpp[0].source,'Previous published offering');
-  assert.equal(offeringsFor(byId.get('1MA336'),2026,3,true).length,0);
+  assert.equal(offeringsFor(byId.get('1MA344'),2026,3,true).length,0);
 });
 
 test('existing saved plans migrate the broken default but preserve subsequent published-only choices', () => {
@@ -207,7 +207,7 @@ test('full-semester degree projects fit a full-time period load without losing c
 test('every target has a visible outcome when completed, unknown, or restricted to published offerings', () => {
   for (const [id,done,options,status] of [
     ['1MA332',set('1MA332'),{},'completed'],
-    ['1MA336',set('1MA259','1MA036'),{},'unscheduled'],
+    ['1MA344',set('1MA259','1MA036'),{},'unscheduled'],
     ['1MA332',new Set(),{projections:false},'unscheduled'],
     ['1MA332',new Set(),{capacity:7.5},'scheduled'],
     ['1MA332',new Set(),{capacity:1},'unscheduled'],
@@ -277,7 +277,7 @@ test('mathematics degree project supports programme semesters 3 and 4 and retain
   assert.equal(publishedOnly.scheduled.size,0);
   assert.match(publishedOnly.unscheduled[0].reason,/semester-4/);
   assert.equal(publishedOnly.years,2);
-  assert.equal(offeringsFor(byId.get('1MA336'),2026,8,true).length,0,'Other semester-only courses retain unknown periods');
+  assert.equal(offeringsFor(byId.get('1MA344'),2026,8,true).length,0,'Other semester-only courses retain unknown periods');
 });
 
 test('the user’s five targets fit two years with the mathematics degree project defaulting to semester 4', () => {
@@ -348,10 +348,55 @@ test('semester choice moves a course and its dependants while preserving offerin
 test('semester options use actual offering mode, outline labels and exceptional project stages', () => {
   assert.deepEqual(semesterOptions(byId.get('1MA080'),2026,2,true).map(o=>[o.semester,o.exceptional]),[[3,true],[4,false]]);
   assert.deepEqual(semesterOptions(byId.get('1MA080'),2026,2,false),[]);
-  assert.deepEqual(semesterOptions(byId.get('1MA336'),2026,8,true),[]);
+  assert.deepEqual(semesterOptions(byId.get('1MA344'),2026,8,true),[]);
   const done=set('1MA007'), targets=set('1MA036');
   const unavailable=makePlan(courses,dependencyPath(targets,done),done,{projections:false,semesterChoices:{'1MA036':3}});
   assert.equal(unavailable.scheduled.size,0);
   assert.match(unavailable.unscheduled[0].reason,/Semester 3 was selected/);
   for (const semesterChoices of [null,[],{'missing':2},{'1MA080':0},{'1MA080':17}]) assert.throws(()=>makePlan(courses,dependencyPath(targets,done),done,{semesterChoices}),/Invalid course semester choices/);
+});
+
+test('autumn odd-year outline notes place Analytic Number Theory and Dynamical Systems in semester 3', () => {
+  for (const id of ['1MA038','1MA217']) {
+    const targets=set(id), plan=makePlan(courses,dependencyPath(targets),new Set());
+    const offering=plan.scheduled.get(id);
+    assert.deepEqual(offering.periods,[4,5]);
+    assert.deepEqual(offering.loads,[5,5]);
+    assert.equal(offering.semesterOnly,true);
+    assert.equal(offering.confirmed,false);
+    assert.equal(offering.outsideOutline,false);
+    assert.equal(plan.years,2);
+    assert.match(offering.loadBasis,/estimated equally/);
+    assert.equal(formatOffering(2026,offering),'Autumn 2027 · Periods not yet planned');
+    assert.match(studyPlanView(plan,targets,new Set(),2026).targets[0].label,/Schedule not yet published/);
+    assert.doesNotMatch(studyPlanView(plan,targets,new Set(),2026).targets[0].label,/P1|P2/);
+    assert.deepEqual(offeringsFor(byId.get(id),2026,2,false),[]);
+    assert.equal(semesterOptions(byId.get(id),2026,2,true)[0].semesterOnly,true);
+  }
+});
+
+test('spring even-year notes preserve rotations, dependencies and chosen-semester constraints', () => {
+  for(const id of ['1MA336','1MA056']) {
+    const offerings=offeringsFor(byId.get(id),2026,4,true);
+    assert.deepEqual(offerings.map(o=>o.periods),[[6,7],[14,15]]);
+    assert.ok(offerings.every(o=>o.semesterOnly && !o.confirmed));
+    assert.equal(formatOffering(2026,offerings[0]),'Spring 2028 · Periods not yet planned');
+  }
+  const targets=set('1MA038'), path=dependencyPath(targets);
+  const invalid=makePlan(courses,path,new Set(),{semesterChoices:{'1MA038':1}});
+  assert.equal(invalid.scheduled.has('1MA038'),false);
+  assert.match(invalid.unscheduled.find(c=>c.id==='1MA038').reason,/Semester 1 was selected/);
+  const valid=makePlan(courses,path,new Set(),{semesterChoices:{'1MA038':3}});
+  assert.equal(valid.scheduled.get('1MA038').chosenSemester,3);
+  assert.ok(valid.scheduled.get('1MA362').periods.at(-1)<valid.scheduled.get('1MA038').periods[0]);
+});
+
+test('published period patterns take precedence over semester-only assumptions', () => {
+  const course={...byId.get('1MA038'),offerings:[{dates:'31 August 2026–17 January 2027',pace:'33%',location:'Uppsala'}]};
+  const offerings=offeringsFor(course,2026,2,true);
+  assert.equal(offerings[0].confirmed,true);
+  assert.ok(offerings.every(o=>!o.semesterOnly));
+  assert.match(formatOffering(2026,offerings[0]),/P1 \+ P2/);
+  const noNote={...byId.get('1MA038'),outline:byId.get('1MA038').outline.map(o=>({...o,note:''}))};
+  assert.deepEqual(offeringsFor(noNote,2026,2,true),[]);
 });
