@@ -2,6 +2,8 @@
 
 An interactive prerequisite map and individual study planner for **Uppsala University’s Master’s Programme in Mathematics (TMA2M)**. The catalogue covers all **52 unique courses** linked from the outline valid from Autumn 2026, including the three tracks, alternatives, bridging courses and degree projects.
 
+**[Open the course planner](https://bennyavelin.github.io/Dependency_diagram/)**
+
 ## Use the planner
 
 1. Add one or more **target courses** using `+` in the catalogue. Search by title/code or filter by track.
@@ -83,7 +85,9 @@ This is an independent planning aid, not a university admissions or degree asses
 
 ## Hosting and privacy
 
-The GitHub repository is private. The private Sites preview is owner-only and is separate from repository access. Students cannot use that private preview unless access is deliberately changed later.
+The GitHub repository and [GitHub Pages site](https://bennyavelin.github.io/Dependency_diagram/) are public. Each push to `main` runs the JavaScript and Python checks, then publishes the static files in `dist/` when those checks pass. Pull requests run checks without publishing. The workflow can also be run manually from GitHub Actions.
+
+The separate Sites preview remains owner-only. Browser-saved course selections stay on the device and are separate for each site address; they are not published with the repository.
 
 No credentials belong in the repository. The application has no analytics, external fonts, application backend or account system. Uppsala source pages are opened only when a user follows a source link.
 
