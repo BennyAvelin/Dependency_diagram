@@ -8,3 +8,4 @@
 @media(max-width:380px){.timeline{grid-template-columns:1fr}}
 @media print{.header,.heading,.target-strip,.workspace,.plan-settings,.secondary-button,.page-footer,.skip{display:none}main{padding:0}.study-plan{border:0;margin:0;padding:0}.timeline{grid-template-columns:repeat(4,1fr)}.period{break-inside:avoid}.review-panel{break-before:page}}
 .planning-mode{font-size:14px;line-height:1.6;padding:12px 16px;background:#edf4e7;border:1px solid #d6e2cc;border-radius:7px;margin:16px 0}.period-dates{font-size:12px;line-height:1.5;color:#788571;margin:0 0 12px}.semester-subtitle{line-height:1.6}.course-offering{padding:10px 0;border-bottom:1px solid #e0e7db}.course-offering>strong{font-size:13px;line-height:1.6}.course-offering .empty-note{margin:5px 0;display:block}.plan-explainer a{color:#2f6846}
+#unplaced .secondary-button{white-space:normal;line-height:1.5;text-align:left;max-width:100%}
