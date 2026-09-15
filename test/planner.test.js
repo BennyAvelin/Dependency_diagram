@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { rules } from '../dist/rules.js';
 import { dependencyPath, makePlan, offeringsFor, parseOffering, validateCatalogue } from '../dist/planner.js';
 import { periodInfo, formatPeriods, periodsForDates } from '../dist/calendar.js';
+import { studyPlanView } from '../dist/plan-view.js';
 import { includeFutureOfferings, planningVersion } from '../dist/settings.js';
 
 const { courses } = JSON.parse(readFileSync(new URL('../dist/catalogue.json', import.meta.url)));
@@ -101,19 +102,25 @@ test('empty and fully completed target sets generate no study load', () => {
   }
 });
 
-test('Lie Algebras uses P4 of odd calendar years and explains the window overflow', () => {
+test('Lie Algebras automatically extends the default plan to P4 of an odd calendar year', () => {
   const path = dependencyPath(set('1MA332'));
   const plan = makePlan(courses,path,new Set());
   assert.deepEqual(plan.scheduled.get('1MA007').periods,[0,1]);
   assert.deepEqual(plan.scheduled.get('1MA036').periods,[4,5]);
-  assert.equal(plan.scheduled.has('1MA332'),false); // Spring 2028 is not an offering.
-  const overflow = plan.unscheduled.find(c=>c.id==='1MA332');
-  assert.match(overflow.reason,/Spring 2029 · P4/);
-  assert.equal(overflow.nextOffering.requiredYears,3);
-  const extended = makePlan(courses,path,new Set(),{years:3});
-  assert.deepEqual(extended.scheduled.get('1MA332').periods,[11]);
-  assert.equal(extended.scheduled.get('1MA332').confirmed,false);
-  assert.deepEqual(extended.unscheduled,[]);
+  assert.deepEqual(plan.scheduled.get('1MA332').periods,[11]); // Spring 2029, never spring 2028.
+  assert.equal(plan.scheduled.get('1MA332').confirmed,false);
+  assert.equal(plan.requestedYears,2);
+  assert.equal(plan.years,3);
+  assert.equal(plan.loads.length,12);
+  assert.deepEqual(plan.unscheduled,[]);
+  const view = studyPlanView(plan,set('1MA332'),new Set(),2026);
+  assert.equal(view.extended,true);
+  assert.equal(view.semesters.length,6);
+  assert.equal(view.semesters[5].year,2029);
+  assert.equal(view.semesters[5].term,'Spring');
+  assert.equal(view.semesters[5].beyondProgramme,true);
+  assert.equal(view.targets[0].status,'scheduled');
+  assert.match(view.targets[0].label,/Spring 2029 · P4 · Provisional offering/);
 });
 
 test('Lie Algebras fits Spring 2027 P4 when Algebraic Structures is already met', () => {
@@ -185,4 +192,129 @@ test('existing saved plans migrate the broken default but preserve subsequent pu
   assert.equal(includeFutureOfferings({projections:false}),true);
   assert.equal(includeFutureOfferings({planningVersion,projections:false}),false);
   assert.equal(includeFutureOfferings({planningVersion,projections:true}),true);
+});
+
+test('full-semester degree projects fit a full-time period load without losing credits', () => {
+  for (const id of ['1MA080','1MA182']) {
+    const offering = offeringsFor(byId.get(id),2026,2,false)[0];
+    assert.deepEqual(offering.periods,[2,3]);
+    assert.deepEqual(offering.loads,[15,15]);
+    assert.match(offering.loadBasis,/Estimated equal credit split/);
+  }
+  assert.deepEqual(offeringsFor(byId.get('2NE831'),2026,2,false)[0].loads,[7.27,.23]);
+});
+
+test('every target has a visible outcome when completed, unknown, or restricted to published offerings', () => {
+  for (const [id,done,options,status] of [
+    ['1MA332',set('1MA332'),{},'completed'],
+    ['1MA336',set('1MA259','1MA036'),{},'unscheduled'],
+    ['1MA332',new Set(),{projections:false},'unscheduled'],
+    ['1MA332',new Set(),{capacity:7.5},'scheduled'],
+    ['1MA332',new Set(),{capacity:1},'unscheduled'],
+  ]) {
+    const plan = makePlan(courses,dependencyPath(set(id),done),done,options);
+    const view = studyPlanView(plan,set(id),done,2026);
+    assert.equal(view.targets.length,1);
+    assert.equal(view.targets[0].id,id);
+    assert.equal(view.targets[0].status,status);
+    if (status !== 'scheduled') assert.equal(plan.years,2,'Unknown or impossible targets do not fill eight empty years');
+  }
+});
+
+test('automatic extension preserves the chosen minimum and contracts when prerequisites are met', () => {
+  const settings = { years:2, startYear:2026, projections:true };
+  const extended = makePlan(courses,dependencyPath(set('1MA332')),new Set(),settings);
+  assert.equal(extended.years,3);
+  assert.equal(settings.years,2);
+  const done = set('1MA007');
+  const shorter = makePlan(courses,dependencyPath(set('1MA332'),done),done,settings);
+  assert.equal(shorter.years,2);
+  assert.equal(studyPlanView(shorter,set('1MA332'),done,2026).extended,false);
+  assert.match(studyPlanView(shorter,set('1MA332'),done,2026).targets[0].label,/Spring 2027 · P4 · Published offering/);
+});
+
+test('all course targets and their union retain valid periods, loads, dependency order and visible target outcomes', () => {
+  const selections = courses.map(c=>set(c.id));
+  selections.push(new Set(courses.map(c=>c.id)));
+  for (const targets of selections) for (const startYear of [2026,2027]) for (const capacity of [7.5,15]) for (const projections of [false,true]) {
+    const done = new Set();
+    const path = dependencyPath(targets,done);
+    const plan = makePlan(courses,path,done,{startYear,capacity,projections});
+    const view = studyPlanView(plan,targets,done,startYear);
+    assert.equal(plan.scheduled.size + plan.unscheduled.length,path.included.size);
+    assert.equal(view.targets.length,targets.size);
+    assert.ok(plan.years>=2 && plan.years<=8);
+    assert.equal(plan.loads.length,view.semesters.length*2);
+    assert.ok(plan.loads.every(load=>Number.isFinite(load) && load<=capacity+.001));
+    for (const [id,offering] of plan.scheduled) {
+      assert.ok(offering.periods.every(p=>p>=0 && p<view.semesters.length*2),`${id}: placement must be rendered`);
+      assert.ok(offeringsFor(byId.get(id),startYear,plan.years,projections).some(o=>o.periods.join()===offering.periods.join() && o.confirmed===offering.confirmed));
+      assert.ok(Math.abs(offering.loads.reduce((n,v)=>n+v,0)-byId.get(id).credits)<.001);
+      for (const edge of path.edges.filter(e=>e.to===id)) {
+        const prerequisite = plan.scheduled.get(edge.from);
+        assert.ok(prerequisite,`${id}: prerequisite ${edge.from} must be placed`);
+        assert.ok(edge.kind==='parallel' ? prerequisite.periods[0]<=offering.periods[0] : prerequisite.periods.at(-1)<offering.periods[0]);
+      }
+    }
+    for (const target of view.targets) assert.equal(target.status,plan.scheduled.has(target.id)?'scheduled':'unscheduled');
+  }
+});
+
+test('mathematics degree project supports programme semesters 3 and 4 and retains provisional status', () => {
+  for (const startYear of [2026,2027,2028,2029,2030]) {
+    const options = offeringsFor(byId.get('1MA080'),startYear,2,true);
+    assert.deepEqual(options.filter(o=>!o.confirmed).map(o=>o.periods),[[4,5],[6,7]]);
+    assert.ok(options.filter(o=>!o.confirmed).every(o=>o.loads.join()==='15,15' && /Programme outline/.test(o.source)));
+    const plan = makePlan(courses,dependencyPath(set('1MA080')),new Set(),{startYear});
+    assert.deepEqual(plan.scheduled.get('1MA080').periods,[4,5]);
+    assert.equal(plan.scheduled.get('1MA080').confirmed,false);
+    assert.match(studyPlanView(plan,set('1MA080'),new Set(),startYear).targets[0].label,new RegExp(`Autumn ${startYear+1} · P1 \\+ P2 · Provisional`));
+    const financial = makePlan(courses,dependencyPath(set('1MA182')),new Set(),{startYear});
+    assert.deepEqual(financial.scheduled.get('1MA182').periods,[6,7]);
+    assert.ok(offeringsFor(byId.get('1MA182'),startYear,2,true).every(o=>o.periods[0]%4===2));
+  }
+  const publishedOnly = makePlan(courses,dependencyPath(set('1MA080')),new Set(),{projections:false});
+  assert.equal(publishedOnly.scheduled.size,0);
+  assert.match(publishedOnly.unscheduled[0].reason,/semester-3/);
+  assert.equal(publishedOnly.years,2);
+  assert.equal(offeringsFor(byId.get('1MA336'),2026,8,true).length,0,'Other semester-only courses retain unknown periods');
+});
+
+test('the user’s five targets fit two years with the mathematics degree project in semester 3', () => {
+  const targets = set('1MA333','1MA325','1MA332','1MA080','1MA337');
+  const completed = set('1MA007','1MA362');
+  const plan = makePlan(courses,dependencyPath(targets,completed),completed);
+  assert.equal(plan.years,2);
+  assert.deepEqual(plan.unscheduled,[]);
+  assert.deepEqual(plan.scheduled.get('1MA080').periods,[4,5]);
+  assert.deepEqual(plan.scheduled.get('1MA333').periods,[2]);
+  assert.deepEqual(plan.scheduled.get('1MA332').periods,[3]);
+  assert.deepEqual(plan.scheduled.get('1MA325').periods,[2,3]);
+  assert.deepEqual(plan.scheduled.get('1MA337').periods,[2]);
+  assert.deepEqual(plan.loads,[10,10,15,10,15,15,0,0]);
+  const view = studyPlanView(plan,targets,completed,2026);
+  assert.equal(view.extended,false);
+  assert.equal(view.targets.filter(t=>t.status==='scheduled').length,5);
+  assert.ok(view.semesters.every(s=>!s.beyondProgramme));
+});
+
+test('ordinary course placements prefer the listed programme semester over an earlier published offering', () => {
+  const plan = makePlan(courses,dependencyPath(set('1TD186')),new Set());
+  const offering = plan.scheduled.get('1TD186');
+  assert.equal(Math.floor(offering.periods[0]/2)+1,3);
+  assert.equal(offering.outsideOutline,false);
+  const withProject = makePlan(courses,dependencyPath(set('1TD186','1MA080')),new Set());
+  assert.equal(withProject.years,2);
+  assert.deepEqual(withProject.scheduled.get('1MA080').periods,[6,7]);
+  assert.equal(withProject.scheduled.get('1MA080').outsideOutline,false);
+});
+
+test('an exploratory placement stays visible but never claims to fit the programme outline', () => {
+  const targets = set('1MA332');
+  const plan = makePlan(courses,dependencyPath(targets),new Set());
+  const offering = plan.scheduled.get('1MA332');
+  assert.deepEqual(offering.periods,[11]);
+  assert.equal(offering.outsideOutline,true);
+  assert.deepEqual(offering.outlineSemesters,[2]);
+  assert.match(studyPlanView(plan,targets,new Set(),2026).targets[0].label,/Outside programme outline; review required/);
 });

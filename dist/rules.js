@@ -10,24 +10,26 @@ const p = (...options) => group('participation', ...options);
 const r = (...options) => group('completed', ...options);
 const parallel = (...options) => group('parallel', ...options);
 const la = x('Linear Algebra II');
-const calc = x('Several Variable Calculus (or the stated alternative)');
+const calc = x('Several Variable Calculus');
+const calcM = x('Several Variable Calculus M');
+const calcLimited = x('Several Variable Calculus, Limited Version');
 
 export const rules = {
   '1MS369': [p(x('Regression Analysis'))],
-  '1MA148': [p(la), p(calc), p(x('Ordinary Differential Equations I'), x('Transform Methods'))],
+  '1MA148': [p(la), p(calc, calcM), p(x('Ordinary Differential Equations I'), x('Transform Methods'))],
   '1MA215': [p('1MA362')],
-  '1MS041': [parallel(x('Several Variable Calculus, Limited Version'))],
+  '1MS041': [parallel(calcLimited)],
   '1MA216': [p('1MA362'), parallel('1MA215')],
   '1MS045': [r('1MS036')],
   '1TD354': [r(x('Scientific Computing II'), x('Introduction to Scientific Computing'), x('Scientific Computing, Bridging Course')), r(calc), r(la)],
   '1MS370': [p(x('Regression Analysis'))],
   '2NE831': [],
-  '1MA209': [r(calc), r(x('Probability and Statistics'), x('Mathematical statistics KF'))],
+  '1MA209': [r(calc, calcLimited, calcM, x('Geometry and Analysis II')), r(x('Probability and Statistics'), x('Mathematical statistics KF'))],
   '1MA259': [p('1MA362')],
   '1MA036': [p('1MA007', x('Mathematical Methods of Physics II')), p(x('Linear Algebra III'), x('Quantum Physics'))],
   '1MA007': [r(la), parallel(x('Basic Ring Theory'), x('Introduction to specialization mathematical physics'))],
-  '1MA362': [p(la), p(calc)],
-  '1MS036': [p(x('Probability Theory I'), x('Probability and Statistics')), p(calc), p(la)],
+  '1MA362': [p(la), p(calc, x('Calculus in Several Variables'), calcM)],
+  '1MS036': [p(x('Probability Theory I'), x('Probability and Statistics')), p(calc, calcM, calcLimited), p(la)],
   '1MA531': [p('1MA362'), p(x('Complex Analysis'))],
   '1MS049': [p('1MS041', '1MA209', x('Regression Analysis'))],
   '1MA196': [r('1MA362', x('Equivalent to Real Analysis'))],
@@ -43,7 +45,7 @@ export const rules = {
   '1MA256': [r(x('Scientific Computing KF'), x('Introduction to Scientific Computing'))],
   '1MS050': [parallel('1MS048')],
   '1MS014': [p(x('Inference Theory I'), x('Probability and Statistics'))],
-  '1MA053': [r(calc), r(la), p(x('Transform Methods'), x('Fourier Analysis'))],
+  '1MA053': [r(calc, calcM, x('Geometry and Analysis III')), r(la), p(x('Transform Methods'), x('Fourier Analysis'))],
   '1MA255': [r('1MA209'), p('1MS036', '1MA215')],
   '1MA333': [r(la), p('1MA007'), p('1MA259')],
   '1MA338': [p('1MA216')],

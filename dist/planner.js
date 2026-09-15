@@ -1,11 +1,49 @@
 import { rules } from './rules.js';
-import { periodsForDates, formatPeriods } from './calendar.js';
+import { periodsForDates, formatPeriods, periodInfo } from './calendar.js';
+import { allowedProgrammeSemesters } from './programme.js';
 
 export function validateCatalogue(courses, ruleSet = rules) {
+  if (!Array.isArray(courses) || !courses.length) throw new Error('Catalogue must contain a non-empty courses array');
+  if (!ruleSet || typeof ruleSet !== 'object') throw new Error('Invalid dependency rules');
+  const text = value => typeof value === 'string' && value.trim().length > 0;
+  const officialUrl = (value, page, query) => {
+    if (!text(value) || value !== value.trim()) return false;
+    try {
+      const url = new URL(value);
+      return url.protocol === 'https:' && ['uu.se', 'www.uu.se'].includes(url.hostname) &&
+        !url.username && !url.password && !url.port && url.pathname === `/en/study/${page}` &&
+        text(url.searchParams.get('query')) && (query === undefined || url.searchParams.get('query') === query);
+    } catch { return false; }
+  };
   const byId = new Map();
   for (const c of courses) {
-    if (!c.id || byId.has(c.id)) throw new Error(`Duplicate or missing course ID: ${c.id}`);
-    if (!c.title || !Number.isFinite(c.credits) || c.credits <= 0) throw new Error(`Invalid course: ${c.id}`);
+    if (!c || !text(c.id) || byId.has(c.id)) throw new Error(`Duplicate or missing course ID: ${c?.id}`);
+    if (!text(c.title) || !Number.isFinite(c.credits) || c.credits <= 0) throw new Error(`Invalid course: ${c.id}`);
+    const invalid = field => { throw new Error(`Invalid ${field} for ${c.id}`); };
+    if (!officialUrl(c.source, 'course', c.id)) invalid('course source URL');
+    if (c.syllabus != null && !officialUrl(c.syllabus, 'syllabus')) invalid('syllabus URL');
+    if (!Array.isArray(c.requirements) || !c.requirements.length || !c.requirements.every(text)) invalid('requirements');
+    if (c.subjectLevels !== undefined && (!Array.isArray(c.subjectLevels) || c.subjectLevels.some(entry =>
+      !entry || !text(entry.subject) || typeof entry.level !== 'string' || !/^[AG][12][A-Z]$/.test(entry.level)))) invalid('subject levels');
+    if (!Array.isArray(c.outline) || !c.outline.length) invalid('outline');
+    for (const entry of c.outline) {
+      if (!entry || !Number.isInteger(entry.semester) || entry.semester < 1 || entry.semester > 4 ||
+          !text(entry.group) || typeof entry.note !== 'string' || !Array.isArray(entry.periods)) invalid('outline entry');
+      let previous = 0, credits = 0;
+      for (const slot of entry.periods) {
+        if (!slot || !Number.isInteger(slot.period) || slot.period <= previous || slot.period > 4 ||
+            !Number.isFinite(slot.credits) || slot.credits <= 0) invalid('outline periods');
+        previous = slot.period; credits += slot.credits;
+      }
+      // Empty grids are legitimate unknown periods. Validate each track's
+      // credit split separately; repeated entries are not extra study load.
+      if (entry.periods.length && Math.abs(credits - c.credits) >= .01) invalid('outline credit total');
+    }
+    if (!Array.isArray(c.offerings)) invalid('offerings');
+    for (const offering of c.offerings) {
+      if (!offering || !text(offering.dates) || !parseOffering(offering.dates)) invalid('offering dates');
+      for (const field of ['pace', 'location']) if (offering[field] != null && typeof offering[field] !== 'string') invalid(`offering ${field}`);
+    }
     byId.set(c.id, c);
   }
   const visited = new Set(), visiting = new Set();
@@ -16,9 +54,9 @@ export function validateCatalogue(courses, ruleSet = rules) {
     if (!Array.isArray(ruleSet[id])) throw new Error(`Unreviewed dependency rules for ${id}`);
     visiting.add(id);
     for (const g of ruleSet[id]) {
-      if (!['completed', 'participation', 'parallel'].includes(g.kind) || !g.options.length) throw new Error(`Invalid requirement for ${id}`);
+      if (!g || !['completed', 'participation', 'parallel'].includes(g.kind) || !Array.isArray(g.options) || !g.options.length) throw new Error(`Invalid requirement for ${id}`);
       for (const o of g.options) {
-        if (Boolean(o.course) === Boolean(o.external)) throw new Error(`Invalid prerequisite option for ${id}`);
+        if (!o || Boolean(o.course) === Boolean(o.external) || (o.course ? !text(o.course) : !text(o.external))) throw new Error(`Invalid prerequisite option for ${id}`);
         if (o.course) visit(o.course);
       }
     }
@@ -73,19 +111,30 @@ function publishedOfferings(course) {
     const periods = slots.map(p => p.period);
     const outline = course.outline.find(o => o.periods?.map(p => p.period).join() === periods.join());
     const matchesOutline = outline && Math.abs(outline.periods.reduce((n,p) => n+p.credits,0)-course.credits)<.01;
+    const semester = periodInfo(slots[0].academicYear, slots[0].period - 1);
+    const fullSemester = slots.length === 2 && dates.start === semester.semesterDates[0] && dates.end === semester.semesterDates[1];
     const days = slots.reduce((n,p) => n+(p.days ?? 0),0);
     const loads = matchesOutline ? outline.periods.map(p=>p.credits)
-      : slots.map(p => Number((course.credits * (days ? p.days/days : 1/slots.length)).toFixed(2)));
+      : slots.map(p => Number((course.credits * (fullSemester || !days ? 1/slots.length : p.days/days)).toFixed(2)));
     loads[loads.length-1] = Number((course.credits-loads.slice(0,-1).reduce((n,p)=>n+p,0)).toFixed(2));
     results.push({ slots, loads, confirmed: true, dates: raw.dates, source: course.source,
-      loadBasis: matchesOutline ? 'Outline credit split' : 'Estimated workload from the published date range' });
+      loadBasis: matchesOutline ? 'Outline credit split' : fullSemester ? 'Estimated equal credit split across a full semester' : 'Estimated workload from the published date range' });
   }
   return results;
+}
+
+export function degreeProjectWindow(course) {
+  // These 30-credit projects have reviewed whole-semester placements. Do not
+  // infer period patterns for other courses from semester-only outline rows.
+  if (!['1MA080', '1MA182'].includes(course.id)) return null;
+  const semesters = [...new Set(course.outline.map(o => o.semester).filter(s => s === 3 || s === 4))].sort();
+  return semesters.length ? { semesters, earliestPeriod: (semesters[0] - 1) * 2 } : null;
 }
 
 export function offeringsFor(course, startYear, years = 2, projections = true) {
   const results = [];
   const published = publishedOfferings(course);
+  const projectWindow = degreeProjectWindow(course);
   for (const offering of published) {
     const { slots, ...details } = offering;
     const periods = slots.map(p=>(p.academicYear-startYear)*4+p.period-1);
@@ -99,6 +148,10 @@ export function offeringsFor(course, startYear, years = 2, projections = true) {
       if (periods.length && !patterns.has(periods.join())) patterns.set(periods.join(),{ periods,loads,basis });
     };
     for (const o of course.outline) if (o.periods?.length) addPattern(o.periods.map(p=>p.period),o.periods.map(p=>p.credits),'Programme outline');
+    for (const semester of projectWindow?.semesters ?? []) {
+      const first = (semester % 2 === 1) ? 1 : 3;
+      addPattern([first, first + 1], [course.credits / 2, course.credits / 2], 'Programme outline: full-semester degree project; estimated equal credit split');
+    }
     const explicitPeriod = notes.match(/period ([1-4])/i);
     if (!patterns.size && explicitPeriod) addPattern([Number(explicitPeriod[1])],[course.credits],'Programme outline');
     // Retain every known pattern, including spring repeats and courses without
@@ -112,6 +165,7 @@ export function offeringsFor(course, startYear, years = 2, projections = true) {
       if (/even years/i.test(notes) && calendarYear % 2 !== 0) continue;
       if (/odd years/i.test(notes) && calendarYear % 2 !== 1) continue;
       const periods = pattern.periods.map(p => offset * 4 + p - 1);
+      if (projectWindow && periods[0] < projectWindow.earliestPeriod) continue;
       // Do not project a different placement over a published offering in that term.
       if (results.some(o => o.confirmed && Math.floor(o.periods[0] / 2) === Math.floor(periods[0] / 2))) continue;
       results.push({ periods, loads: pattern.loads, confirmed: false, dates: 'Future offering not yet confirmed', source: pattern.basis, loadBasis: `${pattern.basis} pattern; provisional` });
@@ -120,23 +174,34 @@ export function offeringsFor(course, startYear, years = 2, projections = true) {
   return results.sort((a, b) => a.periods[0] - b.periods[0]);
 }
 
-export function makePlan(courses, path, completed, { startYear = 2026, years = 2, capacity = 15, projections = true, startPeriod = 1 } = {}) {
-  if (!Number.isInteger(startYear) || !Number.isInteger(years) || years < 1 || !Number.isFinite(capacity) || capacity <= 0 || !Number.isInteger(startPeriod) || startPeriod < 1 || startPeriod > 4) throw new Error('Invalid planning settings');
+export function makePlan(courses, path, completed, { startYear = 2026, years: requestedYears = 2, capacity = 15, projections = true, startPeriod = 1 } = {}) {
+  if (!Number.isInteger(startYear) || !Number.isInteger(requestedYears) || requestedYears < 1 || !Number.isFinite(capacity) || capacity <= 0 || !Number.isInteger(startPeriod) || startPeriod < 1 || startPeriod > 4) throw new Error('Invalid planning settings');
+  // The chosen window is a minimum. Search further so a prerequisite chain or
+  // biennial rotation cannot silently drop a target from the visible plan.
+  const years = Math.max(requestedYears, 8);
   const byId = new Map(courses.map(c => [c.id, c]));
   const loads = Array(years * 4).fill(0), scheduled = new Map(), unscheduled = [];
-  const ids = [...path.included].filter(id => !completed.has(id)).sort((a, b) => path.levels.get(a) - path.levels.get(b) || a.localeCompare(b));
+  // Full-semester projects are flexible end-of-programme work. Place ordinary
+  // course paths first so a project cannot consume a scarce taught-course slot.
+  // Only defer leaves, preserving dependency order if a future course has a
+  // project as a prerequisite.
+  const projectLeaves = new Set([...path.included].filter(id => degreeProjectWindow(byId.get(id)) && !path.edges.some(edge => edge.from === id)));
+  const ids = [...path.included].filter(id => !completed.has(id)).sort((a, b) => Number(projectLeaves.has(a)) - Number(projectLeaves.has(b)) || path.levels.get(a) - path.levels.get(b) || a.localeCompare(b));
   for (const id of ids) {
     const course = byId.get(id);
+    const earliestPeriod = Math.max(startPeriod - 1, degreeProjectWindow(course)?.earliestPeriod ?? 0);
     const dependencies = path.edges.filter(e => e.to === id && !completed.has(e.from));
     const options = offeringsFor(course, startYear, years, projections);
-    const fits = o => o.periods[0] >= startPeriod - 1 &&
+    const outlineSemesters = allowedProgrammeSemesters(course);
+    const inOutline = o => o.periods.every(period => outlineSemesters.includes(Math.floor(period / 2) + 1));
+    const fits = o => o.periods[0] >= earliestPeriod &&
       dependencies.every(e => {
         const prerequisite = scheduled.get(e.from);
         return prerequisite && (e.kind === 'parallel' ? prerequisite.periods[0] <= o.periods[0] : prerequisite.periods.at(-1) < o.periods[0]);
       }) && o.periods.every((period, i) => (loads[period] ?? 0) + o.loads[i] <= capacity + .001);
-    const available = options.find(fits);
+    const available = options.find(o => inOutline(o) && fits(o)) ?? options.find(fits);
     if (available) {
-      scheduled.set(id, available);
+      scheduled.set(id, { ...available, outsideOutline: !inOutline(available), outlineSemesters });
       available.periods.forEach((period, i) => { loads[period] = Number((loads[period]+available.loads[i]).toFixed(2)); });
     } else {
       const blocked = dependencies.filter(e=>!scheduled.has(e.from)).map(e=>byId.get(e.from).title);
@@ -146,8 +211,9 @@ export function makePlan(courses, path, completed, { startYear = 2026, years = 2
       unscheduled.push({ id, reason: next ? `The next offering after these prerequisites is ${formatPeriods(startYear,next.periods)}${next.confirmed ? '' : ' (provisional)'}, outside this ${years}-year window.`
         : !options.length ? 'No offering with known teaching periods in this planning window.'
         : blocked.length ? `First place: ${blocked.join(', ')}.`
-        : 'The available periods do not fit after prerequisites within the chosen credit limit.', availability, nextOffering });
+        : `The available periods do not fit after prerequisites${degreeProjectWindow(course) ? ` and the programme’s semester-${degreeProjectWindow(course).semesters[0]} project start` : ''} within the chosen credit limit.`, availability, nextOffering });
     }
   }
-  return { scheduled, unscheduled, loads };
+  const displayedYears = Math.max(requestedYears, ...[...scheduled.values()].map(o => Math.floor(o.periods.at(-1) / 4) + 1));
+  return { scheduled, unscheduled, loads: loads.slice(0, displayedYears * 4), years: displayedYears, requestedYears, searchYears: years };
 }

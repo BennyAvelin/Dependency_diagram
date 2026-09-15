@@ -35,7 +35,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA148",
@@ -66,7 +72,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA215",
@@ -122,7 +134,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MS041",
@@ -163,7 +181,21 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Computer Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Data Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA216",
@@ -219,7 +251,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MS045",
@@ -269,7 +307,17 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Financial Mathematics",
+          "level": "A1N"
+        },
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1TD354",
@@ -311,7 +359,21 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Computational Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Computer Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Technology",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MS370",
@@ -331,7 +393,13 @@
         "  120 credits including 90 credits in mathematics. Regression Analysis participation. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
       ],
       "offerings": [],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "2NE831",
@@ -357,7 +425,17 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Economics",
+          "level": "A1F"
+        },
+        {
+          "subject": "Financial Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA209",
@@ -394,7 +472,17 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Financial Mathematics",
+          "level": "A1N"
+        },
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA259",
@@ -435,7 +523,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA036",
@@ -476,7 +570,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA007",
@@ -511,7 +611,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "G2F"
+        }
+      ]
     },
     {
       "id": "1MA362",
@@ -546,7 +652,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "G1F"
+        }
+      ]
     },
     {
       "id": "1MS036",
@@ -577,7 +689,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "G2F"
+        }
+      ]
     },
     {
       "id": "1MA531",
@@ -618,7 +736,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MS049",
@@ -655,7 +779,25 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Computer Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Data Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Financial Mathematics",
+          "level": "A1N"
+        },
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA196",
@@ -696,7 +838,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MS052",
@@ -733,7 +881,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA038",
@@ -759,7 +913,13 @@
         "  120 credits including 90 credits in mathematics. Real Analysis participation. Complex Analysis participation. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
       ],
       "offerings": [],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA217",
@@ -785,7 +945,13 @@
         "  120 credits including 90 credits in mathematics. Participation in Real Analysis. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
       ],
       "offerings": [],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1RT700",
@@ -821,7 +987,29 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Computer Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Data Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Image Analysis and Machine Learning",
+          "level": "A1N"
+        },
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        },
+        {
+          "subject": "Technology",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1TD062",
@@ -847,7 +1035,25 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Computational Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Computer Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Data Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Technology",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MS012",
@@ -889,7 +1095,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MS900",
@@ -924,7 +1136,17 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Data Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MS048",
@@ -959,7 +1181,17 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Data Science",
+          "level": "A1F"
+        },
+        {
+          "subject": "Mathematics",
+          "level": "A1F"
+        }
+      ]
     },
     {
       "id": "1MA331",
@@ -1001,7 +1233,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA256",
@@ -1032,7 +1270,17 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Computational Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MS050",
@@ -1063,7 +1311,17 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Data Science",
+          "level": "A1F"
+        },
+        {
+          "subject": "Mathematics",
+          "level": "A1F"
+        }
+      ]
     },
     {
       "id": "1MS014",
@@ -1105,7 +1363,21 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Data Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Financial Mathematics",
+          "level": "A1N"
+        },
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA053",
@@ -1136,7 +1408,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA255",
@@ -1167,7 +1445,17 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Financial Mathematics",
+          "level": "A1N"
+        },
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA333",
@@ -1198,7 +1486,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1F"
+        }
+      ]
     },
     {
       "id": "1MA338",
@@ -1233,7 +1527,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1F"
+        }
+      ]
     },
     {
       "id": "1MA325",
@@ -1268,7 +1568,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1F"
+        }
+      ]
     },
     {
       "id": "1MS030",
@@ -1303,7 +1609,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1F"
+        }
+      ]
     },
     {
       "id": "1MA332",
@@ -1334,7 +1646,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1F"
+        }
+      ]
     },
     {
       "id": "1MA336",
@@ -1354,7 +1672,13 @@
         "  120 credits including 90 credits Mathematics. Differential topology participation. Modules and homological algebra participation. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
       ],
       "offerings": [],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1F"
+        }
+      ]
     },
     {
       "id": "1MA056",
@@ -1374,7 +1698,13 @@
         "  120 credits including 90 credits mathematics of 60 credits mathematics and 60 credits physics. Participation in Algebraic Structures or Symmetry and Group Theory in Physics. Participation in Linear Algebra III or Quantum Physics. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
       ],
       "offerings": [],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA337",
@@ -1405,7 +1735,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA081",
@@ -1425,7 +1761,13 @@
         "  A Bachelor's degree and, in addition, at least 15 credits in mathematics at Master's level. Admission requires a project plan accepted by the department. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
       ],
       "offerings": [],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1E"
+        }
+      ]
     },
     {
       "id": "1MA181",
@@ -1445,7 +1787,13 @@
         "  A Bachelor's degree and, in addition, at least 15 credits in financial mathematics at Master's level. Admission requires a project plan accepted by the department. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
       ],
       "offerings": [],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Financial Mathematics",
+          "level": "A1E"
+        }
+      ]
     },
     {
       "id": "1MA080",
@@ -1477,7 +1825,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A2E"
+        }
+      ]
     },
     {
       "id": "1TD186",
@@ -1503,7 +1857,21 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Computational Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Computer Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Financial Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1RT001",
@@ -1529,7 +1897,25 @@
           "location": "Flexible"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Computer Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Data Science",
+          "level": "A1N"
+        },
+        {
+          "subject": "Image Analysis and Machine Learning",
+          "level": "A1N"
+        },
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "2NE814",
@@ -1549,7 +1935,13 @@
         "  A Bachelor's degree, equivalent to a Swedish Kandidatexamen, from an internationally recognised university. Also required is 60 credits in economics and 15 credits in statistics (or closely related subject).  "
       ],
       "offerings": [],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Economics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "2NE811",
@@ -1569,7 +1961,13 @@
         "  A Bachelor's degree, equivalent to a Swedish Kandidatexamen, from an internationally recognised university. Also required is 60 credits in economics and 15 credits in statistics (or closely related subject).  "
       ],
       "offerings": [],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Economics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1TD056",
@@ -1595,7 +1993,21 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Computational Science",
+          "level": "A1F"
+        },
+        {
+          "subject": "Computer Science",
+          "level": "A1F"
+        },
+        {
+          "subject": "Technology",
+          "level": "A1F"
+        }
+      ]
     },
     {
       "id": "1MA344",
@@ -1615,7 +2027,13 @@
         "  120 credits and 30 credits in mathematics at advanced level. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
       ],
       "offerings": [],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1F"
+        }
+      ]
     },
     {
       "id": "1MA342",
@@ -1635,7 +2053,13 @@
         "  120 credits and 30 credits in mathematics at advanced level. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
       ],
       "offerings": [],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1F"
+        }
+      ]
     },
     {
       "id": "1MS051",
@@ -1655,7 +2079,13 @@
         "  120 credits including Probability Theory II and Inference Theory II or equivalent. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
       ],
       "offerings": [],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Mathematics",
+          "level": "A1N"
+        }
+      ]
     },
     {
       "id": "1MA182",
@@ -1681,7 +2111,13 @@
           "location": "Uppsala"
         }
       ],
-      "checkedOn": "2026-09-15"
+      "checkedOn": "2026-09-15",
+      "subjectLevels": [
+        {
+          "subject": "Financial Mathematics",
+          "level": "A2E"
+        }
+      ]
     }
   ]
 }

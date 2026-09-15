@@ -8,8 +8,9 @@ An interactive prerequisite map and individual study planner for **Uppsala Unive
 2. Select a course in the map or catalogue to inspect its requirements and official sources.
 3. Mark courses **already studied / requirement met** to stop expanding their prerequisites. Only mark a course when your prior study meets its role in the path; a completed-course condition still requires a pass.
 4. Choose a route for requirements with alternatives. Only the chosen route enters the graph. If no choice has been made, a completed alternative is preferred, otherwise the first option is used.
-5. Review the study plan. Change the starting academic year, credit limit or planning window (2–4 academic years). **Provisional future offerings are included by default** and shown with dashed cards. Turn them off to restrict the view to published offerings. If an odd/even rotation falls outside the window, the planner reports the next feasible offering and offers to extend the window.
-6. Review background studies and full entry conditions below the timeline. Download a JSON plan for your records.
+5. Review the study plan. Change the starting academic year, credit limit or minimum plan window (2–4 academic years). **Provisional future offerings are included by default** and shown with dashed cards. Turn them off to restrict the view to published offerings. The timeline automatically extends when a prerequisite chain or rotation needs more years, searching up to eight academic years. Added semesters are labelled as beyond the standard two-year programme. Every target has a visible placement, completed status or explanation above the timeline; click a placed target to jump to its course card.
+6. Check programme fit above the timeline: each semester should total 30 credits, the four-semester programme 120 credits, and the degree project must occupy an allowed semester. Placements outside the outline and missing credits are flagged. Already-studied prerequisite markers are not automatically counted as degree credits.
+7. Review background studies and full entry conditions below the timeline. Download a JSON plan for your records.
 
 Selections are saved in this browser’s local storage. Nothing is sent to a backend. Downloaded plans are records; importing them is not currently supported.
 
@@ -27,7 +28,7 @@ Open <http://127.0.0.1:5173>. There are no application dependencies and no build
 npm run check
 ```
 
-This checks JavaScript syntax and runs the Node test suite. GitHub Actions runs the same checks on pushes and pull requests. Tests cover catalogue validation, cycles, shared prerequisite closures, alternatives, completed courses, parallel study, confirmed versus projected offerings, odd/even-year rules, unknown periods and period credit limits.
+This checks JavaScript syntax and runs the Node test suite. GitHub Actions runs these checks and the offline Python importer tests on pushes and pull requests. Tests cover catalogue validation, cycles, shared prerequisite closures, alternatives, completed courses, parallel study, confirmed versus projected offerings, odd/even-year rules, unknown periods and period credit limits.
 
 ## Source data
 
@@ -47,6 +48,8 @@ See [data methodology](docs/data-methodology.md) for how requirements and period
 | `dist/catalogue.json` | Official course facts and source links |
 | `dist/rules.js` | Reviewed prerequisite groups and interpretation notes |
 | `dist/planner.js` | Dependency closure and conditional scheduling |
+| `dist/programme.js` | Programme-semester placement and workload/subject-credit assessment |
+| `dist/plan-view.js` | Effective timeline and explicit target placement statuses |
 | `dist/calendar.js` | Official faculty calendar and shared timeline/period labels |
 | `dist/settings.js` | Planning mode defaults and saved-plan migration |
 | `scripts/import_catalogue.py` | Maintainer-only official data refresh |
@@ -72,7 +75,7 @@ This is an independent planning aid, not a university admissions or degree asses
 - The graph expands programme and bridging courses. Named studies outside that catalogue appear as background requirements with a checklist, rather than fabricated courses or dates.
 - Credit totals, subject distributions, degree requirements, English proficiency, equivalence and approved degree-project plans require individual review. Full official entry wording is retained for each course.
 - Prior participation is scheduled before the dependent course. Concurrent placement is permitted only when explicitly stated. A “participation” edge does not mean that passing is required.
-- The planner places courses greedily in an earliest available period subject to dependencies and the selected credit limit. It is not an optimiser and does not establish that an unplaced course is impossible to schedule.
+- The planner first seeks a placement in the course’s listed programme semesters, subject to dependencies and the selected credit limit. Full-semester degree projects are placed after taught courses; Mathematics Degree Project E supports semesters 3 and 4. If only an exploratory placement outside the outline fits, it is explicitly flagged. It is not an optimiser and does not establish that an unplaced course is impossible to schedule.
 - Future projection reuses explicit outline periods, previous published offering patterns and year rotations. It is a scenario assumption, not a promise that a course will run. No exact period is invented for a course listed only by semester without a dated offering or explicit period pattern.
 - Credit loads describe work in the selected path, including any bridging courses. They are **not** eligible degree-credit totals. Additional course choices may be needed for the 120-credit programme.
 - Timetable clashes, admission capacity and special permissions are not checked.
@@ -83,4 +86,4 @@ The GitHub repository is private. The private Sites preview is owner-only and is
 
 No credentials belong in the repository. The application has no analytics, external fonts, application backend or account system. Uppsala source pages are opened only when a user follows a source link.
 
-The app optionally registers a `set_course_targets` WebMCP tool when the browser supports `document.modelContext`. It uses the same target state as the visible controls and validates all IDs before mutation. No supported live WebMCP validation context was available during setup, so this optional integration has not been verified in a supporting browser. Browser interaction and visual QA have not been run; verification covered the planning engine, source data, syntax and static serving.
+The app optionally registers a `set_course_targets` WebMCP tool when the browser supports `document.modelContext`. It uses the same target state as the visible controls and validates all IDs before mutation. No supported live WebMCP validation context was available during setup, so this optional integration has not been verified in a supporting browser. The local browser was checked with the user’s saved five-target selection, including visible Lie Algebras and degree-project placements and the programme credit report. See [system audit](docs/system-audit.md) for coverage and remaining limits.
