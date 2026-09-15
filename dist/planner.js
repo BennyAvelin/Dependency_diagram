@@ -1,5 +1,5 @@
 import { rules } from './rules.js';
-import { periodsForDates, formatPeriods, formatOffering, periodInfo } from './calendar.js';
+import { periodsForDates, formatOffering, periodInfo } from './calendar.js';
 import { allowedProgrammeSemesters } from './programme.js';
 
 export function validateCatalogue(courses, ruleSet = rules) {
@@ -236,7 +236,7 @@ export function makePlan(courses, path, completed, { startYear = 2026, years: re
       const next = !blocked.length && offeringsFor(course,startYear,years+2,projections).find(o=>o.periods.at(-1)>=years*4 && fits(o));
       const nextOffering = next ? { ...next, requiredYears: Math.floor(next.periods.at(-1)/4)+1 } : null;
       unscheduled.push({ id, reason: chosenSemester ? `Semester ${chosenSemester} was selected, but no offering fits there with the current prerequisites, offering mode and credit limit. Change the semester choice or adjust the plan; the course has not been moved automatically.`
-        : next ? `The next offering after these prerequisites is ${formatPeriods(startYear,next.periods)}${next.confirmed ? '' : ' (provisional)'}, outside this ${years}-year window.`
+        : next ? `The next offering after these prerequisites is ${formatOffering(startYear,next)}${next.confirmed ? '' : ' (provisional)'}, outside this ${years}-year window.`
         : !options.length ? 'No offering with known teaching periods in this planning window.'
         : blocked.length ? `First place: ${blocked.join(', ')}.`
         : `The available periods do not fit after prerequisites${project ? ' and the default semester-4 project start (semester 3 requires an explicit exceptional choice for Mathematics)' : ''} within the chosen credit limit.`, availability, nextOffering });
