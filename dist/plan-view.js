@@ -13,7 +13,7 @@ export function studyPlanView(plan, targets, completed, startYear) {
     targets: [...targets].map(id => {
       const offering = plan.scheduled.get(id);
       if (completed.has(id)) return { id, status: 'completed', label: 'Already studied / requirement met' };
-      if (offering) return { id, status: 'scheduled', label: `${formatPeriods(startYear, offering.periods)} · ${offering.confirmed ? 'Published offering' : 'Provisional offering'}${offering.outsideOutline ? ' · Outside programme outline; review required' : ''}` };
+      if (offering) return { id, status: 'scheduled', label: `${formatPeriods(startYear, offering.periods)} · ${offering.confirmed ? 'Published offering' : 'Provisional offering'}${offering.exceptionalProject ? ' · Semester 3 exception; review required' : ''}${offering.outsideOutline ? ' · Outside programme outline; review required' : ''}` };
       const unplaced = plan.unscheduled.find(item => item.id === id);
       return { id, status: 'unscheduled', label: `Not yet scheduled: ${unplaced?.reason ?? 'Select a prerequisite route to plan this target.'}` };
     }),

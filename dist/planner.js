@@ -174,12 +174,26 @@ export function offeringsFor(course, startYear, years = 2, projections = true) {
   return results.sort((a, b) => a.periods[0] - b.periods[0]);
 }
 
-export function makePlan(courses, path, completed, { startYear = 2026, years: requestedYears = 2, capacity = 15, projections = true, startPeriod = 1 } = {}) {
+export function semesterOptions(course, startYear, years = 8, projections = true) {
+  const allowed = allowedProgrammeSemesters(course);
+  const earliest = degreeProjectWindow(course)?.earliestPeriod ?? 0;
+  const semesters = new Map();
+  for (const offering of offeringsFor(course, startYear, years, projections)) {
+    if (offering.periods[0] < earliest) continue;
+    const semester = Math.floor(offering.periods[0] / 2) + 1;
+    const existing = semesters.get(semester);
+    semesters.set(semester, { semester, confirmed: Boolean(existing?.confirmed || offering.confirmed), outsideOutline: !allowed.includes(semester), exceptional: course.id === '1MA080' && semester === 3 });
+  }
+  return [...semesters.values()];
+}
+
+export function makePlan(courses, path, completed, { startYear = 2026, years: requestedYears = 2, capacity = 15, projections = true, startPeriod = 1, semesterChoices = {} } = {}) {
   if (!Number.isInteger(startYear) || !Number.isInteger(requestedYears) || requestedYears < 1 || !Number.isFinite(capacity) || capacity <= 0 || !Number.isInteger(startPeriod) || startPeriod < 1 || startPeriod > 4) throw new Error('Invalid planning settings');
   // The chosen window is a minimum. Search further so a prerequisite chain or
   // biennial rotation cannot silently drop a target from the visible plan.
   const years = Math.max(requestedYears, 8);
   const byId = new Map(courses.map(c => [c.id, c]));
+  if (!semesterChoices || typeof semesterChoices !== 'object' || Array.isArray(semesterChoices) || Object.entries(semesterChoices).some(([id, semester]) => !byId.has(id) || !Number.isInteger(semester) || semester < 1 || semester > years * 2)) throw new Error('Invalid course semester choices');
   const loads = Array(years * 4).fill(0), scheduled = new Map(), unscheduled = [];
   // Full-semester projects are flexible end-of-programme work. Place ordinary
   // course paths first so a project cannot consume a scarce taught-course slot.
@@ -189,29 +203,34 @@ export function makePlan(courses, path, completed, { startYear = 2026, years: re
   const ids = [...path.included].filter(id => !completed.has(id)).sort((a, b) => Number(projectLeaves.has(a)) - Number(projectLeaves.has(b)) || path.levels.get(a) - path.levels.get(b) || a.localeCompare(b));
   for (const id of ids) {
     const course = byId.get(id);
-    const earliestPeriod = Math.max(startPeriod - 1, degreeProjectWindow(course)?.earliestPeriod ?? 0);
+    const chosenSemester = semesterChoices[id];
+    // Semester 3 is an explicit exception, never an automatic project fallback.
+    const project = degreeProjectWindow(course);
+    const projectStart = project ? (course.id === '1MA080' && chosenSemester === 3 ? 4 : 6) : 0;
+    const earliestPeriod = Math.max(startPeriod - 1, projectStart);
     const dependencies = path.edges.filter(e => e.to === id && !completed.has(e.from));
     const options = offeringsFor(course, startYear, years, projections);
     const outlineSemesters = allowedProgrammeSemesters(course);
     const inOutline = o => o.periods.every(period => outlineSemesters.includes(Math.floor(period / 2) + 1));
-    const fits = o => o.periods[0] >= earliestPeriod &&
+    const fits = o => o.periods[0] >= earliestPeriod && (!chosenSemester || o.periods.every(period => Math.floor(period / 2) + 1 === chosenSemester)) &&
       dependencies.every(e => {
         const prerequisite = scheduled.get(e.from);
         return prerequisite && (e.kind === 'parallel' ? prerequisite.periods[0] <= o.periods[0] : prerequisite.periods.at(-1) < o.periods[0]);
       }) && o.periods.every((period, i) => (loads[period] ?? 0) + o.loads[i] <= capacity + .001);
     const available = options.find(o => inOutline(o) && fits(o)) ?? options.find(fits);
     if (available) {
-      scheduled.set(id, { ...available, outsideOutline: !inOutline(available), outlineSemesters });
+      scheduled.set(id, { ...available, outsideOutline: !inOutline(available), outlineSemesters, chosenSemester: chosenSemester ?? null, exceptionalProject: course.id === '1MA080' && chosenSemester === 3 });
       available.periods.forEach((period, i) => { loads[period] = Number((loads[period]+available.loads[i]).toFixed(2)); });
     } else {
       const blocked = dependencies.filter(e=>!scheduled.has(e.from)).map(e=>byId.get(e.from).title);
       const availability = options.map(o=>`${formatPeriods(startYear,o.periods)}${o.confirmed ? '' : ' (provisional)'}`).join('; ');
       const next = !blocked.length && offeringsFor(course,startYear,years+2,projections).find(o=>o.periods.at(-1)>=years*4 && fits(o));
       const nextOffering = next ? { ...next, requiredYears: Math.floor(next.periods.at(-1)/4)+1 } : null;
-      unscheduled.push({ id, reason: next ? `The next offering after these prerequisites is ${formatPeriods(startYear,next.periods)}${next.confirmed ? '' : ' (provisional)'}, outside this ${years}-year window.`
+      unscheduled.push({ id, reason: chosenSemester ? `Semester ${chosenSemester} was selected, but no offering fits there with the current prerequisites, offering mode and credit limit. Change the semester choice or adjust the plan; the course has not been moved automatically.`
+        : next ? `The next offering after these prerequisites is ${formatPeriods(startYear,next.periods)}${next.confirmed ? '' : ' (provisional)'}, outside this ${years}-year window.`
         : !options.length ? 'No offering with known teaching periods in this planning window.'
         : blocked.length ? `First place: ${blocked.join(', ')}.`
-        : `The available periods do not fit after prerequisites${degreeProjectWindow(course) ? ` and the programme’s semester-${degreeProjectWindow(course).semesters[0]} project start` : ''} within the chosen credit limit.`, availability, nextOffering });
+        : `The available periods do not fit after prerequisites${project ? ' and the default semester-4 project start (semester 3 requires an explicit exceptional choice for Mathematics)' : ''} within the chosen credit limit.`, availability, nextOffering });
     }
   }
   const displayedYears = Math.max(requestedYears, ...[...scheduled.values()].map(o => Math.floor(o.periods.at(-1) / 4) + 1));

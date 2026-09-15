@@ -6,7 +6,7 @@ import { restorePlanSettings, planningVersion } from '../dist/settings.js';
 const {courses}=JSON.parse(readFileSync(new URL('../dist/catalogue.json',import.meta.url)));
 
 test('saved targets, exact prerequisites, completed courses and explicit mode survive reload',()=>{
-  const saved={targets:['1MA332','1MA080'],completed:['1MA007'],choices:{'1MA036:0':1},met:['Linear Algebra II'],startYear:2027,capacity:10,years:3,projections:false,planningVersion};
+  const saved={targets:['1MA332','1MA080'],completed:['1MA007'],choices:{'1MA036:0':1},semesterChoices:{'1MA080':3,'1MA036':1},met:['Linear Algebra II'],startYear:2027,capacity:10,years:3,projections:false,planningVersion};
   assert.deepEqual(restorePlanSettings(saved,courses,rules),saved);
 });
 test('invalid saved fields are isolated without discarding valid choices',()=>{
@@ -18,4 +18,11 @@ test('invalid saved fields are isolated without discarding valid choices',()=>{
 test('empty saved targets stay empty while malformed root data falls back safely',()=>{
   assert.deepEqual(restorePlanSettings({targets:[]},courses,rules).targets,[]);
   for(const value of [null,undefined,3,'bad',[],{}]) assert.deepEqual(restorePlanSettings(value,courses,rules).targets,['1MA338']);
+});
+
+test('semester choices survive mode changes and reject corrupt stored values',()=>{
+  const parsed=restorePlanSettings({semesterChoices:{'1MA080':3,'1MA036':16,'missing':2,'1MA332':'2','1MA333':0,'1MA325':17},projections:false,planningVersion},courses,rules);
+  assert.deepEqual(parsed.semesterChoices,{'1MA080':3,'1MA036':16});
+  assert.equal(parsed.projections,false);
+  assert.deepEqual(restorePlanSettings({},courses,rules).semesterChoices,{});
 });

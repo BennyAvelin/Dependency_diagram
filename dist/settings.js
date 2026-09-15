@@ -15,6 +15,12 @@ export function restorePlanSettings(saved, courses, rules) {
   const uniqueIds = (values,fallback=[]) => [...new Set((Array.isArray(values) ? values : fallback).filter(id=>typeof id==='string' && ids.has(id)))];
   const externalLabels = new Set(Object.values(rules).flatMap(groups=>groups.flatMap(g=>g.options.filter(o=>o.external).map(o=>o.external))));
   const choices = {};
+  const semesterChoices = {};
+  if (valid.semesterChoices && typeof valid.semesterChoices === 'object' && !Array.isArray(valid.semesterChoices)) {
+    for (const [id, semester] of Object.entries(valid.semesterChoices)) {
+      if (ids.has(id) && Number.isInteger(semester) && semester >= 1 && semester <= 16) semesterChoices[id] = semester;
+    }
+  }
   if (valid.choices && typeof valid.choices==='object' && !Array.isArray(valid.choices)) {
     for (const [key,value] of Object.entries(valid.choices)) {
       const match = key.match(/^([^:]+):(0|[1-9]\d*)$/);
@@ -22,7 +28,7 @@ export function restorePlanSettings(saved, courses, rules) {
     }
   }
   return {
-    targets: uniqueIds(valid.targets,defaults), completed: uniqueIds(valid.completed), choices,
+    targets: uniqueIds(valid.targets,defaults), completed: uniqueIds(valid.completed), choices, semesterChoices,
     met: [...new Set((Array.isArray(valid.met) ? valid.met : []).filter(label=>externalLabels.has(label)))],
     startYear: [2026,2027,2028,2029,2030].includes(valid.startYear) ? valid.startYear : 2026,
     capacity: [7.5,10,15,20].includes(valid.capacity) ? valid.capacity : 15,

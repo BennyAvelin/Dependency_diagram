@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { rules } from '../dist/rules.js';
-import { dependencyPath, makePlan, offeringsFor, parseOffering, validateCatalogue } from '../dist/planner.js';
+import { dependencyPath, makePlan, offeringsFor, parseOffering, validateCatalogue, semesterOptions } from '../dist/planner.js';
 import { periodInfo, formatPeriods, periodsForDates } from '../dist/calendar.js';
 import { studyPlanView } from '../dist/plan-view.js';
 import { includeFutureOfferings, planningVersion } from '../dist/settings.js';
@@ -266,32 +266,32 @@ test('mathematics degree project supports programme semesters 3 and 4 and retain
     assert.deepEqual(options.filter(o=>!o.confirmed).map(o=>o.periods),[[4,5],[6,7]]);
     assert.ok(options.filter(o=>!o.confirmed).every(o=>o.loads.join()==='15,15' && /Programme outline/.test(o.source)));
     const plan = makePlan(courses,dependencyPath(set('1MA080')),new Set(),{startYear});
-    assert.deepEqual(plan.scheduled.get('1MA080').periods,[4,5]);
+    assert.deepEqual(plan.scheduled.get('1MA080').periods,[6,7]);
     assert.equal(plan.scheduled.get('1MA080').confirmed,false);
-    assert.match(studyPlanView(plan,set('1MA080'),new Set(),startYear).targets[0].label,new RegExp(`Autumn ${startYear+1} · P1 \\+ P2 · Provisional`));
+    assert.match(studyPlanView(plan,set('1MA080'),new Set(),startYear).targets[0].label,new RegExp(`Spring ${startYear+2} · P3 \\+ P4 · Provisional`));
     const financial = makePlan(courses,dependencyPath(set('1MA182')),new Set(),{startYear});
     assert.deepEqual(financial.scheduled.get('1MA182').periods,[6,7]);
     assert.ok(offeringsFor(byId.get('1MA182'),startYear,2,true).every(o=>o.periods[0]%4===2));
   }
   const publishedOnly = makePlan(courses,dependencyPath(set('1MA080')),new Set(),{projections:false});
   assert.equal(publishedOnly.scheduled.size,0);
-  assert.match(publishedOnly.unscheduled[0].reason,/semester-3/);
+  assert.match(publishedOnly.unscheduled[0].reason,/semester-4/);
   assert.equal(publishedOnly.years,2);
   assert.equal(offeringsFor(byId.get('1MA336'),2026,8,true).length,0,'Other semester-only courses retain unknown periods');
 });
 
-test('the user’s five targets fit two years with the mathematics degree project in semester 3', () => {
+test('the user’s five targets fit two years with the mathematics degree project defaulting to semester 4', () => {
   const targets = set('1MA333','1MA325','1MA332','1MA080','1MA337');
   const completed = set('1MA007','1MA362');
   const plan = makePlan(courses,dependencyPath(targets,completed),completed);
   assert.equal(plan.years,2);
   assert.deepEqual(plan.unscheduled,[]);
-  assert.deepEqual(plan.scheduled.get('1MA080').periods,[4,5]);
+  assert.deepEqual(plan.scheduled.get('1MA080').periods,[6,7]);
   assert.deepEqual(plan.scheduled.get('1MA333').periods,[2]);
   assert.deepEqual(plan.scheduled.get('1MA332').periods,[3]);
   assert.deepEqual(plan.scheduled.get('1MA325').periods,[2,3]);
   assert.deepEqual(plan.scheduled.get('1MA337').periods,[2]);
-  assert.deepEqual(plan.loads,[10,10,15,10,15,15,0,0]);
+  assert.deepEqual(plan.loads,[10,10,15,10,0,0,15,15]);
   const view = studyPlanView(plan,targets,completed,2026);
   assert.equal(view.extended,false);
   assert.equal(view.targets.filter(t=>t.status==='scheduled').length,5);
@@ -317,4 +317,41 @@ test('an exploratory placement stays visible but never claims to fit the program
   assert.equal(offering.outsideOutline,true);
   assert.deepEqual(offering.outlineSemesters,[2]);
   assert.match(studyPlanView(plan,targets,new Set(),2026).targets[0].label,/Outside programme outline; review required/);
+});
+
+test('semester 3 project is available only by explicit exception and automatic restores semester 4', () => {
+  const targets = set('1MA080'), path = dependencyPath(targets);
+  const exceptional = makePlan(courses,path,new Set(),{semesterChoices:{'1MA080':3}});
+  assert.deepEqual(exceptional.scheduled.get('1MA080').periods,[4,5]);
+  assert.equal(exceptional.scheduled.get('1MA080').exceptionalProject,true);
+  assert.match(studyPlanView(exceptional,targets,new Set(),2026).targets[0].label,/Semester 3 exception/);
+  assert.deepEqual(makePlan(courses,path,new Set()).scheduled.get('1MA080').periods,[6,7]);
+  const overloaded = makePlan(courses,path,new Set(),{capacity:10,semesterChoices:{'1MA080':3}});
+  assert.equal(overloaded.scheduled.size,0);
+  assert.match(overloaded.unscheduled[0].reason,/Semester 3 was selected/);
+  const financial = makePlan(courses,dependencyPath(set('1MA182')),new Set(),{semesterChoices:{'1MA182':3}});
+  assert.equal(financial.scheduled.size,0);
+});
+
+test('semester choice moves a course and its dependants while preserving offering rotations', () => {
+  const targets=set('1MA332'), done=set('1MA007');
+  const plan=makePlan(courses,dependencyPath(targets,done),done,{semesterChoices:{'1MA036':3}});
+  assert.deepEqual(plan.scheduled.get('1MA036').periods,[4,5]);
+  assert.deepEqual(plan.scheduled.get('1MA332').periods,[11]);
+  assert.equal(plan.years,3);
+  assert.equal(plan.scheduled.get('1MA036').chosenSemester,3);
+  const conflict=makePlan(courses,dependencyPath(targets,done),done,{semesterChoices:{'1MA036':3,'1MA332':2}});
+  assert.equal(conflict.scheduled.has('1MA332'),false);
+  assert.match(conflict.unscheduled.find(c=>c.id==='1MA332').reason,/Semester 2 was selected/);
+});
+
+test('semester options use actual offering mode, outline labels and exceptional project stages', () => {
+  assert.deepEqual(semesterOptions(byId.get('1MA080'),2026,2,true).map(o=>[o.semester,o.exceptional]),[[3,true],[4,false]]);
+  assert.deepEqual(semesterOptions(byId.get('1MA080'),2026,2,false),[]);
+  assert.deepEqual(semesterOptions(byId.get('1MA336'),2026,8,true),[]);
+  const done=set('1MA007'), targets=set('1MA036');
+  const unavailable=makePlan(courses,dependencyPath(targets,done),done,{projections:false,semesterChoices:{'1MA036':3}});
+  assert.equal(unavailable.scheduled.size,0);
+  assert.match(unavailable.unscheduled[0].reason,/Semester 3 was selected/);
+  for (const semesterChoices of [null,[],{'missing':2},{'1MA080':0},{'1MA080':17}]) assert.throws(()=>makePlan(courses,dependencyPath(targets,done),done,{semesterChoices}),/Invalid course semester choices/);
 });
