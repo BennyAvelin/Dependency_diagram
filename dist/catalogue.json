@@ -1,0 +1,1687 @@
+{
+  "programme": "Master’s Programme in Mathematics",
+  "code": "TMA2M",
+  "credits": 120,
+  "validFrom": "Autumn 2026",
+  "outlineSource": "https://www.uu.se/en/study/outline?query=53757e7c-b967-4250-83db-911b32fbdfc8",
+  "checkedOn": "2026-09-15",
+  "courses": [
+    {
+      "id": "1MS369",
+      "title": "Generalised Linear Models",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1MS369",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            }
+          ],
+          "note": "The course is given in period 1 in even years ."
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=45538",
+      "requirements": [
+        "120 credits including 90 credits in mathematics. Participation in Regression Analysis. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–1 November 2026",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA148",
+      "title": "Applied Mathematics",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA148",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=45563",
+      "requirements": [
+        "120 credits including 45 credits in mathematics. Participation in Linear Algebra II and in Several Variable Calculus or Several Variable Calculus M and in Ordinary Differential Equations I or Transform Methods. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–1 November 2026",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA215",
+      "title": "Integration Theory",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA215",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            },
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        },
+        {
+          "semester": 1,
+          "group": "Track: Mathematics",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            },
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        },
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=9cb1c7d4-17a7-11f1-9ed1-51bcbc0e4a82",
+      "requirements": [
+        "120 credits including 90 credits in mathematics. Participation in Real Analysis. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–17 January 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MS041",
+      "title": "Introduction to Data Science",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MS041",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            },
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        },
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=50940",
+      "requirements": [
+        "120 credits including 80 credits in computer science and mathematics, of which at least 15 credits in computer science including programming, and at least 30 credits in mathematics including probability and statistics, linear algebra and analysis. Participation in, or taken in parallel with, Several Variable Calculus, Limited Version. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–17 January 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA216",
+      "title": "Partial Differential Equations",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA216",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            },
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        },
+        {
+          "semester": 1,
+          "group": "Track: Mathematics",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            },
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        },
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=50948",
+      "requirements": [
+        "120 credits including 90 credits in mathematics. Participation in Real Analysis. Participation in Integration Theory or read in parallel. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–17 January 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MS045",
+      "title": "Probability and Martingales",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MS045",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            },
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        },
+        {
+          "semester": 1,
+          "group": "Track: Financial Mathematics",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            },
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=51600",
+      "requirements": [
+        "120 credits including 90 credits in mathematics. Probability theory II. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–17 January 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1TD354",
+      "title": "Scientific Computing for Partial Differential Equations",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1TD354",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        },
+        {
+          "semester": 1,
+          "group": "Track: Financial Mathematics",
+          "periods": [
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=50132",
+      "requirements": [
+        "120 credits in science/engineering. Scientific Computing II or Introduction to Scientific Computing or Scientific Computing, Bridging Course. Several Variable Calculus. Linear Algebra II. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "2 November 2026–17 January 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MS370",
+      "title": "Analysis of Categorical Data",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1MS370",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [],
+          "note": "The course is given in period 2 in odd years."
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=46831",
+      "requirements": [
+        "  120 credits including 90 credits in mathematics. Regression Analysis participation. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
+      ],
+      "offerings": [],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "2NE831",
+      "title": "Financial Theory",
+      "credits": 7.5,
+      "source": "https://www.uu.se/en/study/course?query=2NE831",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Track: Financial Mathematics",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=42888",
+      "requirements": [
+        "A Bachelor's degree, equivalent to a Swedish Kandidatexamen, from an internationally recognised university. Also required is 60 credits in economics and 15 credits in statistics (or a closely related subject)."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–3 November 2026",
+          "pace": "50%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA209",
+      "title": "Financial Derivatives",
+      "credits": 7.5,
+      "source": "https://www.uu.se/en/study/course?query=1MA209",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Track: Financial Mathematics",
+          "periods": [
+            {
+              "period": 2,
+              "credits": 7.5
+            }
+          ],
+          "note": ""
+        },
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=51597",
+      "requirements": [
+        "120 credits including 40 credits in mathematics. Several Variable Calculus, Several Variable Calculus, Limited Version, Several Variable Calculus M or Geometry and Analysis II. Probability and Statistics or Mathematical statistics KF. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "2 November 2026–17 January 2027",
+          "pace": "50%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA259",
+      "title": "Differential Topology",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA259",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Track: Mathematics",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            },
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        },
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=46835",
+      "requirements": [
+        "120 credits including 90 credits in mathematics. Participation in Real Analysis. Basic Topology is recommended. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–17 January 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA036",
+      "title": "Modules and Homological Algebra",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA036",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Track: Mathematics",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            },
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        },
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=50946",
+      "requirements": [
+        "120 credits including 90 credits in mathematics or 60 credits in mathematics and 60 credits in physics. Participation in Algebraic Structures or Mathematical Methods of Physics II. Participation in Linear Algebra III or Quantum Physics. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–17 January 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA007",
+      "title": "Algebraic Structures",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA007",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Bridging courses",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            },
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=d5c3d925-1715-11f1-9ed1-51bcbc0e4a82",
+      "requirements": [
+        "60 credits in mathematics. Linear Algebra II. Participation in Basic Ring Theory or participation in Introduction to specialization mathematical physics (can be read in parallel)."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–17 January 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA362",
+      "title": "Real Analysis",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA362",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Bridging courses",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            },
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=2185537b-16ea-11f1-9ed1-51bcbc0e4a82",
+      "requirements": [
+        "25 credits in mathematics. Participation in Linear Algebra II. Participation in one of the courses Calculus in Several Variables, Several Variable Calculus, or Several Variable Calculus M."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–17 January 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MS036",
+      "title": "Probability Theory II",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1MS036",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Bridging courses",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=48613",
+      "requirements": [
+        "60 credits including 20 credits in mathematics. Participation in Probability Theory I or Probability and Statistics. Participation in Several Variable Calculus M, Several Variable Calculus or Several Variable Calculus Limited Version. Participation in Linear Algebra II."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–1 November 2026",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA531",
+      "title": "Analytic Functions",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA531",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Alternative coures",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            },
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": "The course is given in in the fall semester in even years."
+        },
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": "The course is given in in the fall semester in even years."
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=51603",
+      "requirements": [
+        "120 credits including 90 credits in mathematics. Participation in Real Analysis and Complex Analysis. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–17 January 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MS049",
+      "title": "Computer-Intensive Statistics and Applications",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MS049",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Alternative coures",
+          "periods": [
+            {
+              "period": 2,
+              "credits": 10.0
+            }
+          ],
+          "note": ""
+        },
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=49881",
+      "requirements": [
+        "120 credits including 60 credits mathematics and/or data science with at least 45 credits mathematics. Participation in one of the courses Regression analysis, Introduction to data science or Financial Derivatives. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "2 November 2026–17 January 2027",
+          "pace": "67%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA196",
+      "title": "Riemannian Geometry",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA196",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Alternative coures",
+          "periods": [
+            {
+              "period": 1,
+              "credits": 5.0
+            },
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": "The course is given in in the fall semester in even years."
+        },
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": "The course is given in in the fall semester in even years."
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=44368",
+      "requirements": [
+        "120 credits including 90 credits in mathematics. Real Analysis or the equivalent. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–17 January 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MS052",
+      "title": "Survival Analysis",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1MS052",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Alternative coures",
+          "periods": [
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        },
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=50974",
+      "requirements": [
+        "120 credits science/engineering of which 90 credits in mathematics. Regression analysis."
+      ],
+      "offerings": [
+        {
+          "dates": "2 November 2026–17 January 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA038",
+      "title": "Analytic Number Theory",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA038",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Alternative coures",
+          "periods": [],
+          "note": "The course is given in in the fall semester in odd years."
+        },
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": "The course is given in in the fall semester in odd years."
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=45572",
+      "requirements": [
+        "  120 credits including 90 credits in mathematics. Real Analysis participation. Complex Analysis participation. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
+      ],
+      "offerings": [],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA217",
+      "title": "Dynamical Systems",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA217",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Alternative coures",
+          "periods": [],
+          "note": "The course is given in in the fall semester in odd years."
+        },
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": "The course is given in in the fall semester in odd years."
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=46830",
+      "requirements": [
+        "  120 credits including 90 credits in mathematics. Participation in Real Analysis. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
+      ],
+      "offerings": [],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1RT700",
+      "title": "Statistical Machine Learning",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1RT700",
+      "outline": [
+        {
+          "semester": 1,
+          "group": "Alternative coures",
+          "periods": [
+            {
+              "period": 2,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=48552",
+      "requirements": [
+        "120 credits including Probability and Statistics, Linear Algebra II, Single Variable Calculus and a course in introductory programming. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "2 November 2026–17 January 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        },
+        {
+          "dates": "18 January 2027–21 March 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1TD062",
+      "title": "High Performance Programming",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1TD062",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=51576",
+      "requirements": [
+        "120 credits in science/engineering including 30 credits Mathematics and 10 credits in computer programming. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "18 January 2027–21 March 2027",
+          "pace": "67%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MS012",
+      "title": "Markov Processes",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MS012",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [
+            {
+              "period": 3,
+              "credits": 10.0
+            }
+          ],
+          "note": ""
+        },
+        {
+          "semester": 2,
+          "group": "Track: Financial Mathematics",
+          "periods": [
+            {
+              "period": 3,
+              "credits": 10.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=47676",
+      "requirements": [
+        "120 credits. Probability Theory I. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "18 January 2027–21 March 2027",
+          "pace": "67%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MS900",
+      "title": "Bayesian Statistics",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MS900",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [
+            {
+              "period": 3,
+              "credits": 5.0
+            },
+            {
+              "period": 4,
+              "credits": 5.0
+            }
+          ],
+          "note": "The course is given in the spring semester in odd years."
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=49883",
+      "requirements": [
+        "120 credits including 60 credits in mathematics and/or data science including at least 45 credits in mathematics. Participation in Introduction to Data Science or participation in both Inference Theory II and Regression Analysis. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "18 January 2027–6 June 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MS048",
+      "title": "Foundations of Data Science",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MS048",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [
+            {
+              "period": 3,
+              "credits": 5.0
+            },
+            {
+              "period": 4,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=49469",
+      "requirements": [
+        "120 credits including 30 credits in mathematics och 10 credits in computer science. Participation in Introduction to Data Science. Participation in Linear Algebra for Data Science or Linear Algebra II. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "18 January 2027–6 June 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA331",
+      "title": "Functional Analysis",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA331",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [
+            {
+              "period": 4,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        },
+        {
+          "semester": 2,
+          "group": "Track: Mathematics",
+          "periods": [
+            {
+              "period": 4,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=45839",
+      "requirements": [
+        "120 credits including 90 credits in mathematics. Linear Algebra II. Participation in Real Analysis. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "22 March 2027–6 June 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA256",
+      "title": "Modelling Complex Systems",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA256",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [
+            {
+              "period": 4,
+              "credits": 10.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=ccebcfca-b4e2-11f0-bd83-743a3e5145ea",
+      "requirements": [
+        "120 credits including 40 credits in mathematics. One of the courses Scientific Computing KF and Introduction to Scientific Computing. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "22 March 2027–6 June 2027",
+          "pace": "67%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MS050",
+      "title": "Topics in Data Science",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1MS050",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [
+            {
+              "period": 4,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=49470",
+      "requirements": [
+        "120 credits. Participation in Foundations in Data Science (or the course could be taken in parallel). Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "22 March 2027–6 June 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MS014",
+      "title": "Analysis of Time Series",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MS014",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Applied Mathematics and Statistics",
+          "periods": [
+            {
+              "period": 4,
+              "credits": 10.0
+            }
+          ],
+          "note": ""
+        },
+        {
+          "semester": 2,
+          "group": "Track: Financial Mathematics",
+          "periods": [
+            {
+              "period": 4,
+              "credits": 10.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=45562",
+      "requirements": [
+        "120 credits in science/engineering. Participation in Inference Theory I or Probability and Statistics. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "22 March 2027–6 June 2027",
+          "pace": "67%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA053",
+      "title": "Introduction to Partial Differential Equations",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA053",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Financial Mathematics",
+          "periods": [
+            {
+              "period": 3,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=46832",
+      "requirements": [
+        "120 credits including 60 credits in mathematics. Several Variable Calculus, Several Variable Calculus M or Geometry and Analysis III. Linear Algebra II. Participation in Transform Methods or Fourier Analysis. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "18 January 2027–21 March 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA255",
+      "title": "Partial Differential Equations with Applications to Finance",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA255",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Financial Mathematics",
+          "periods": [
+            {
+              "period": 4,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=50195",
+      "requirements": [
+        "120 credits including 90 credits in mathematics. Financial Derivatives. Participation in Probability Theory II or Integration Theory. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "22 March 2027–6 June 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA333",
+      "title": "Lie Groups",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA333",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Mathematics",
+          "periods": [
+            {
+              "period": 3,
+              "credits": 5.0
+            }
+          ],
+          "note": "The course is given in period 3 in odd years."
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=45856",
+      "requirements": [
+        "120 credits including 90 credits in mathematics. Linear Algebra II. Participation in Algebraic Structures and Differential Topology. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "18 January 2027–21 March 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA338",
+      "title": "Non-Linear Partial Differential Equations",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA338",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Mathematics",
+          "periods": [
+            {
+              "period": 3,
+              "credits": 5.0
+            },
+            {
+              "period": 4,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=45911",
+      "requirements": [
+        "120 credits including 90 credits in mathematics. Participation in Partial Differential Equations. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "18 January 2027–6 June 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA325",
+      "title": "Commutative Algebra and Algebraic Geometry",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA325",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Mathematics",
+          "periods": [
+            {
+              "period": 3,
+              "credits": 5.0
+            },
+            {
+              "period": 4,
+              "credits": 5.0
+            }
+          ],
+          "note": "The course is given in the spring semester in odd years."
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=46168",
+      "requirements": [
+        "120 credits including 90 credits in mathematics. Participation in Modules and Homological Algebra. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "18 January 2027–6 June 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MS030",
+      "title": "Stochastic Processes",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MS030",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Mathematics",
+          "periods": [
+            {
+              "period": 3,
+              "credits": 5.0
+            },
+            {
+              "period": 4,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=51602",
+      "requirements": [
+        "120 credits including 90 credits in mathematics. Participation in Integration Theory and Probability Theory II. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "18 January 2027–6 June 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA332",
+      "title": "Lie Algebras",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA332",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Mathematics",
+          "periods": [
+            {
+              "period": 4,
+              "credits": 5.0
+            }
+          ],
+          "note": "The course is given in period 4 in odd years."
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=45847",
+      "requirements": [
+        "120 credits including 90 credits Mathematic. Linear Algebra II. Modules and homological algebra taken. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "22 March 2027–6 June 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA336",
+      "title": "Algebraic Topology",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA336",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Mathematics",
+          "periods": [],
+          "note": "The course is given in the spring semester in even years."
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=45909",
+      "requirements": [
+        "  120 credits including 90 credits Mathematics. Differential topology participation. Modules and homological algebra participation. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
+      ],
+      "offerings": [],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA056",
+      "title": "Representation Theory for Finite Groups",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA056",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "Track: Mathematics",
+          "periods": [],
+          "note": "The course is given in the spring semester in even years."
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=50947",
+      "requirements": [
+        "  120 credits including 90 credits mathematics of 60 credits mathematics and 60 credits physics. Participation in Algebraic Structures or Symmetry and Group Theory in Physics. Participation in Linear Algebra III or Quantum Physics. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
+      ],
+      "offerings": [],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA337",
+      "title": "Perspectives on Mathematics",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA337",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "All tracks",
+          "periods": [
+            {
+              "period": 3,
+              "credits": 5.0
+            }
+          ],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=3538ad35-17a7-11f1-9ed1-51bcbc0e4a82",
+      "requirements": [
+        "120 credits including 90 credits Mathematics. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "18 January 2027–21 March 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA081",
+      "title": "Degree Project D in Mathematics",
+      "credits": 15.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA081",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "All tracks",
+          "periods": [],
+          "note": "The student who intends to obtain A Degree of Master (One Year) shall take this course."
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=38293",
+      "requirements": [
+        "  A Bachelor's degree and, in addition, at least 15 credits in mathematics at Master's level. Admission requires a project plan accepted by the department. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
+      ],
+      "offerings": [],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA181",
+      "title": "Degree Project D in Financial Mathematics",
+      "credits": 15.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA181",
+      "outline": [
+        {
+          "semester": 2,
+          "group": "All tracks",
+          "periods": [],
+          "note": "The student who intends to obtain A Degree of Master (One Year) shall take this course."
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=38292",
+      "requirements": [
+        "  A Bachelor's degree and, in addition, at least 15 credits in financial mathematics at Master's level. Admission requires a project plan accepted by the department. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
+      ],
+      "offerings": [],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA080",
+      "title": "Degree Project E in Mathematics",
+      "credits": 30.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA080",
+      "outline": [
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        },
+        {
+          "semester": 4,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=43807",
+      "requirements": [
+        "A Bachelor's degree and, in addition, at least 30 credits in mathematics at Master's level. Admission requires a project plan accepted by the department. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "18 January 2027–6 June 2027",
+          "pace": "100%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1TD186",
+      "title": "Computational Finance: Pricing and Valuation",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1TD186",
+      "outline": [
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=f4c44a66-1652-11f1-9ed1-51bcbc0e4a82",
+      "requirements": [
+        "120 credits in science/engineering including one of the courses Scientific Computing II / Scientific Computing, Bridging Course / Introduction to Scientific Computing. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–1 November 2026",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1RT001",
+      "title": "Mathematical Modelling of Football",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1RT001",
+      "outline": [
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=44142",
+      "requirements": [
+        "120 credits including Probability and Statistics, Linear Algebra, Single Variable Calculus and a course in introductory programming. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "31 August 2026–1 November 2026",
+          "pace": "33%",
+          "location": "Flexible"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "2NE814",
+      "title": "Macroeconomic Theory",
+      "credits": 7.5,
+      "source": "https://www.uu.se/en/study/course?query=2NE814",
+      "outline": [
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=42881",
+      "requirements": [
+        "  A Bachelor's degree, equivalent to a Swedish Kandidatexamen, from an internationally recognised university. Also required is 60 credits in economics and 15 credits in statistics (or closely related subject).  "
+      ],
+      "offerings": [],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "2NE811",
+      "title": "Microeconomic Theory",
+      "credits": 7.5,
+      "source": "https://www.uu.se/en/study/course?query=2NE811",
+      "outline": [
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=42831",
+      "requirements": [
+        "  A Bachelor's degree, equivalent to a Swedish Kandidatexamen, from an internationally recognised university. Also required is 60 credits in economics and 15 credits in statistics (or closely related subject).  "
+      ],
+      "offerings": [],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1TD056",
+      "title": "Applied Finite Element Methods",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1TD056",
+      "outline": [
+        {
+          "semester": 3,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=47756",
+      "requirements": [
+        "120 credits in science/engineering including 30 credits in mathematics, where 5 credits linear algebra and 5 credits several variable calculus must be covered. Participation in Scientific Computing III or Scientific Computing for Partial Differential Equations. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "2 November 2026–17 January 2027",
+          "pace": "33%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA344",
+      "title": "Selected Topics in Mathematics",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA344",
+      "outline": [
+        {
+          "semester": 3,
+          "group": "Courses that can be given in any period during the programmen.",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=49393",
+      "requirements": [
+        "  120 credits and 30 credits in mathematics at advanced level. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
+      ],
+      "offerings": [],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA342",
+      "title": "Selected Topics in Mathematics",
+      "credits": 10.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA342",
+      "outline": [
+        {
+          "semester": 3,
+          "group": "Courses that can be given in any period during the programmen.",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=49388",
+      "requirements": [
+        "  120 credits and 30 credits in mathematics at advanced level. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
+      ],
+      "offerings": [],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MS051",
+      "title": "Selected Topics in Mathematical Statistics",
+      "credits": 5.0,
+      "source": "https://www.uu.se/en/study/course?query=1MS051",
+      "outline": [
+        {
+          "semester": 3,
+          "group": "Courses that can be given in any period during the programmen.",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=49396",
+      "requirements": [
+        "  120 credits including Probability Theory II and Inference Theory II or equivalent. Proficiency in English equivalent to the Swedish upper secondary course English 6.  "
+      ],
+      "offerings": [],
+      "checkedOn": "2026-09-15"
+    },
+    {
+      "id": "1MA182",
+      "title": "Degree Project E in Financial Mathematics",
+      "credits": 30.0,
+      "source": "https://www.uu.se/en/study/course?query=1MA182",
+      "outline": [
+        {
+          "semester": 4,
+          "group": "Preliminary outline 2027/2028",
+          "periods": [],
+          "note": ""
+        }
+      ],
+      "syllabus": "https://www.uu.se/en/study/syllabus?query=38294",
+      "requirements": [
+        "A Bachelor's degree and, in addition, at least 30 credits in financial mathematics at Master's level. Admission requires a project plan accepted by the department. Proficiency in English equivalent to the Swedish upper secondary course English 6."
+      ],
+      "offerings": [
+        {
+          "dates": "18 January 2027–6 June 2027",
+          "pace": "100%",
+          "location": "Uppsala"
+        }
+      ],
+      "checkedOn": "2026-09-15"
+    }
+  ]
+}

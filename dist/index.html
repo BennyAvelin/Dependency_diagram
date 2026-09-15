@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Plan a path through Uppsala University's mathematics master's programme. Select target courses, explore prerequisites, and compare teaching periods.">
+  <meta name="theme-color" content="#102724"><title>Course Atlas · Uppsala Mathematics</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+<a class="skip" href="#search">Skip to course selection</a>
+<header class="header"><a class="brand" href="./"><span class="brand-mark" aria-hidden="true">CA</span> Course Atlas</a><span class="header-label">UPPSALA · MATHEMATICS</span><a class="sample" href="https://www.uu.se/en/study/outline?query=53757e7c-b967-4250-83db-911b32fbdfc8" target="_blank" rel="noreferrer">Official programme outline ↗</a></header>
+<main>
+  <div class="heading"><div><p class="eyebrow">MASTER’S PROGRAMME IN MATHEMATICS · 120 CREDITS</p><h1>Start with where you want to go.</h1><p>Choose your target courses. Trace the prerequisites. Build your study plan.</p></div><div class="totals"><strong id="total-courses">52</strong><span>courses to explore</span></div></div>
+  <div id="error" role="alert" hidden></div>
+  <div class="target-strip"><div><span class="section-label">YOUR TARGETS</span><div id="targets"></div></div><button id="clear" class="text-button">Clear targets</button></div>
+  <div class="workspace">
+    <aside class="catalogue" aria-label="Course catalogue"><div class="panel-heading"><h2>Choose courses</h2><span id="catalogue-count"></span></div>
+      <div class="catalogue-filters"><label for="search" class="sr-only">Search courses by name or code</label><input id="search" type="search" placeholder="Search name or code…"><label for="track" class="sr-only">Filter courses</label><select id="track"><option value="all">All programme courses</option value="Track: Mathematics">Mathematics track</option><option value="Track: Applied Mathematics and Statistics">Applied maths & statistics</option><option value="Track: Financial Mathematics">Financial mathematics</option><option value="Bridging courses">Bridging courses</option></select></div>
+      <p class="list-help">+ adds a target. Select a name for details.</p><div id="course-list" tabindex="-1"></div><p class="catalogue-note">Outline valid from Autumn 2026.<br>Second-year outline is preliminary.</p></aside>
+    <section class="diagram-panel" aria-label="Interactive prerequisite diagram"><div class="diagram-heading"><div><h2>Your prerequisite map</h2><p id="path-summary">Loading course requirements…</p></div><span class="map-hint">Drag to pan</span></div><div id="viewport" aria-label="Dependency diagram. Drag to pan; use the zoom controls below."><div id="world"><svg id="connections" aria-hidden="true"></svg><div id="nodes"></div></div><div id="map-empty" hidden>Add a target course to explore its prerequisites.</div></div><div class="map-footer"><div class="legend"><span><i class="target-color"></i>Target</span><span><i class="math"></i>Prerequisite</span><span><i class="done-color"></i>Already studied</span><span>╌ May be parallel</span></div><div class="zoom-controls" aria-label="Map controls"><button id="zoom-out" aria-label="Zoom out">−</button><output id="zoom-label" aria-label="Zoom level">100%</output><button id="zoom-in" aria-label="Zoom in">+</button><button id="fit">Fit</button></div></div><p class="map-scope">Arrows show the selected route through programme and bridging courses. Background studies and other entry requirements appear in the course details and plan review below.</p></section>
+    <aside id="details" class="details" aria-label="Selected course details"></aside>
+  </div>
+  <section class="study-plan" aria-labelledby="plan-title"><div class="plan-heading"><div><p class="eyebrow">FROM TARGETS TO A TIMELINE</p><h2 id="plan-title">Your individual study plan</h2><p>A suggested order for your selected path. Add other courses to complete your programme.</p></div><button id="export" class="secondary-button">Download plan</button></div>
+    <div class="plan-settings"><label>Starting autumn <select id="start-year"><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option></select></label><label>Credits per period <select id="capacity"><option value="15">15 · full time</option><option value="10">10</option><option value="7.5">7.5 · half time</option><option value="20">20 · heavier load</option></select></label><label class="check-label"><input id="projections" type="checkbox"> Include projected future offerings</label><span id="save-state">Saved in this browser only</span></div>
+    <p class="plan-explainer">P1–P2: autumn. P3–P4: spring. A course spanning two periods appears in both with its credit load split. Projected offerings reuse the outline’s periods and odd/even-year rules; they are not confirmed course instances.</p>
+    <div id="plan-summary" role="status"></div><div id="timeline" class="timeline"></div><div id="unplaced"></div>
+    <details class="review-panel" open><summary id="review-summary">Review background and entry requirements</summary><p class="review-intro">These studies sit outside the programme catalogue. Mark a requirement as met only if your previous studies satisfy the wording in the linked official course requirements. Your checks are planning notes, not an admission decision.</p><div id="background"></div><div id="eligibility"></div></details>
+    <p class="planning-note">The planner uses a conservative, earliest-fit order. Prior participation is placed before a dependent course unless parallel study is explicitly allowed. It checks period credit loads, but not timetable clashes, admission decisions, degree rules or optimality. An unplaced course does not prove that no feasible plan exists.</p>
+  </section>
+  <footer class="page-footer"><span>Independent planning aid · Uppsala University source data checked <span id="checked-on"></span></span><span>Plans stay on this device. No account or analytics.</span></footer>
+  <p id="announcement" class="sr-only" aria-live="polite"></p>
+  <noscript><p>Enable JavaScript to explore the courses. The official programme outline is linked above.</p></noscript>
+</main>
+</body></html>

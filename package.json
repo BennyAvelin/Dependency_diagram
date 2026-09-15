@@ -1,0 +1,13 @@
+{
+  "name": "course-dependency-diagram",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "An accessible, interactive course prerequisite explorer.",
+  "scripts": {
+    "dev": "python3 -m http.server 5173 --directory dist --bind 127.0.0.1",
+    "test": "node --test",
+    "check": "node --check dist/app.js && node --check dist/planner.js && node --check dist/rules.js && npm test"
+  },
+  "engines": { "node": ">=22" }
+}
