@@ -18,3 +18,4 @@
 #semester-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.semester-choice{min-width:0;margin:16px 0}.semester-choice label{display:block;font-size:14px;font-weight:600;line-height:1.5;margin-bottom:8px}.semester-choice select{font-size:14px}.semester-choice p{font-size:13px;line-height:1.5}@media(max-width:800px){#semester-choices{grid-template-columns:1fr}}
 
 .semester-reservations{border:1px dashed #bbab6e;border-radius:8px;padding:12px;margin:12px 0;background:#faf9ef}.semester-reservations h4{font-size:14px;margin:0 0 10px;color:#715a26}.semester-reservations .empty-note{font-size:13px;line-height:1.6}
+.planning-disclaimer{margin:0 0 20px;padding:16px 20px;border:1px solid #d7e1d9;border-left:4px solid #45766b;border-radius:8px;background:#fff;color:#29443c;font-size:1rem;line-height:1.6}.planning-disclaimer a{color:#2c6b49;text-underline-offset:3px}
