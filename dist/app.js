@@ -10,7 +10,7 @@ const el = (tag, className, text) => { const node = document.createElement(tag);
 const button = (text, className, action, label) => { const b = el('button', className, text); b.type = 'button'; b.addEventListener('click', action); if (label) b.setAttribute('aria-label', label); return b; };
 const storageKey = 'uppsala-course-atlas-v1';
 let catalogue, courses, byId, path, plan;
-let targets = new Set(['1MA338']), completed = new Set(), choices = {}, semesterChoices = {}, met = new Set();
+let targets = new Set(), completed = new Set(), choices = {}, semesterChoices = {}, met = new Set();
 let selected = '1MA338', startYear = 2026, capacity = 15, projections = true, years = 2;
 let view = { x: 20, y: 20, scale: 1 }, world = { width: 1000, height: 500 };
 let persistence = true;

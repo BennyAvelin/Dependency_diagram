@@ -17,7 +17,11 @@ test('invalid saved fields are isolated without discarding valid choices',()=>{
 });
 test('empty saved targets stay empty while malformed root data falls back safely',()=>{
   assert.deepEqual(restorePlanSettings({targets:[]},courses,rules).targets,[]);
-  for(const value of [null,undefined,3,'bad',[],{}]) assert.deepEqual(restorePlanSettings(value,courses,rules).targets,['1MA338']);
+  for(const value of [null,undefined,3,'bad',[],{}, {targets:'bad',completed:'bad'}]) {
+    const restored = restorePlanSettings(value,courses,rules);
+    assert.deepEqual(restored.targets,[]);
+    assert.deepEqual(restored.completed,[]);
+  }
 });
 
 test('semester choices survive mode changes and reject corrupt stored values',()=>{

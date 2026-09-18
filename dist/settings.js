@@ -11,7 +11,6 @@ export function includeFutureOfferings(saved) {
 export function restorePlanSettings(saved, courses, rules) {
   const valid = saved && typeof saved === 'object' && !Array.isArray(saved) ? saved : {};
   const ids = new Set(courses.map(c=>c.id));
-  const defaults = ids.has('1MA338') ? ['1MA338'] : courses.slice(0,1).map(c=>c.id);
   const uniqueIds = (values,fallback=[]) => [...new Set((Array.isArray(values) ? values : fallback).filter(id=>typeof id==='string' && ids.has(id)))];
   const externalLabels = new Set(Object.values(rules).flatMap(groups=>groups.flatMap(g=>g.options.filter(o=>o.external).map(o=>o.external))));
   const choices = {};
@@ -28,7 +27,7 @@ export function restorePlanSettings(saved, courses, rules) {
     }
   }
   return {
-    targets: uniqueIds(valid.targets,defaults), completed: uniqueIds(valid.completed), choices, semesterChoices,
+    targets: uniqueIds(valid.targets), completed: uniqueIds(valid.completed), choices, semesterChoices,
     met: [...new Set((Array.isArray(valid.met) ? valid.met : []).filter(label=>externalLabels.has(label)))],
     startYear: [2026,2027,2028,2029,2030].includes(valid.startYear) ? valid.startYear : 2026,
     capacity: [7.5,10,15,20,'unlimited'].includes(valid.capacity) ? valid.capacity : 15,
