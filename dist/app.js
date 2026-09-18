@@ -265,7 +265,10 @@ function renderDegreeRequirements(report) {
   const subjects = Object.entries(report.mainFieldAdvancedCredits);
   requirement('At least 60', 'Advanced credits in your main field, including the degree project', subjects.length ? subjects.map(([subject, credits]) => `${subject}: ${credits} planned`).join(' · ') : 'No advanced main-field credits planned yet');
   requirement('30 credits', 'Degree project', report.degreeProject.missing ? 'Still needed in an outline-supported semester' : 'Placed in your plan · Entry requirements need review');
-  overview.append(grid, el('p', 'degree-caveat', 'Planning totals do not confirm degree eligibility. Verify course inclusion, prior studies and formal requirements with the programme adviser.'));
+  const notice = el('aside', 'planning-disclaimer context-disclaimer');
+  notice.setAttribute('aria-label', 'Degree requirements disclaimer');
+  notice.append(el('strong', '', 'Provided as is. '), document.createTextNode('This overview is not an official degree assessment and may be incomplete or out of date. Verify degree requirements, course inclusion and prior studies against the official programme syllabus and with the programme adviser.'));
+  overview.append(notice, grid);
   const details = el('details', 'degree-requirements');
   details.append(el('summary', '', 'Credit classifications & programme rules'));
   const requirements = el('ul');

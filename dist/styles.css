@@ -204,3 +204,6 @@ body:has(#course-drawer[open]){overflow:hidden}
   .degree-essential{padding:14px}.degree-essential>strong{font-size:23px}
 }
 @media print{.quick-guide{display:none}.degree-overview{break-inside:avoid}}
+
+.context-disclaimer{font-size:14px;line-height:1.6;margin:18px 0;padding:14px 16px;max-inline-size:75ch}
+.degree-overview .context-disclaimer{margin:14px 0 18px}
