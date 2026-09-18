@@ -35,3 +35,34 @@ export function restorePlanSettings(saved, courses, rules) {
     projections: includeFutureOfferings(valid), planningVersion,
   };
 }
+
+export function importPlanSettings(payload, courses, rules) {
+  if (!payload || payload.format !== 'uppsala-course-atlas-plan-v2') {
+    throw new Error('Choose a JSON plan downloaded from Course Atlas.');
+  }
+  const object = value => value && typeof value === 'object' && !Array.isArray(value);
+  if (!object(payload.settings)) throw new Error('The plan is missing its planning settings.');
+  const saved = {
+    targets: payload.targets, completed: payload.alreadyStudied,
+    choices: payload.choices, semesterChoices: payload.semesterChoices ?? {},
+    met: payload.backgroundMarkedMet,
+    startYear: payload.settings.startYear, capacity: payload.settings.capacity,
+    years: payload.settings.years, projections: payload.settings.projections, planningVersion,
+  };
+  const restored = restorePlanSettings(saved, courses, rules);
+  for (const key of ['targets', 'completed', 'met']) {
+    if (!Array.isArray(saved[key]) || JSON.stringify(saved[key]) !== JSON.stringify(restored[key])) {
+      throw new Error(`The plan contains invalid or unknown entries in ${key}.`);
+    }
+  }
+  for (const key of ['choices', 'semesterChoices']) {
+    if (!object(saved[key]) || Object.keys(saved[key]).length !== Object.keys(restored[key]).length
+      || Object.entries(saved[key]).some(([id, value]) => restored[key][id] !== value)) {
+      throw new Error(`The plan contains invalid ${key}.`);
+    }
+  }
+  for (const key of ['startYear', 'capacity', 'years', 'projections']) {
+    if (saved[key] !== restored[key]) throw new Error(`The plan contains an unsupported ${key} setting.`);
+  }
+  return restored;
+}

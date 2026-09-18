@@ -2,8 +2,36 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { rules } from '../dist/rules.js';
-import { restorePlanSettings, planningVersion } from '../dist/settings.js';
+import { restorePlanSettings, importPlanSettings, planningVersion } from '../dist/settings.js';
 const {courses}=JSON.parse(readFileSync(new URL('../dist/catalogue.json',import.meta.url)));
+
+const downloadedPlan = () => ({
+  format:'uppsala-course-atlas-plan-v2', targets:['1MA332'], alreadyStudied:['1MA007'],
+  choices:{'1MA036:0':1}, semesterChoices:{'1MA036':3}, backgroundMarkedMet:['Linear Algebra II'],
+  settings:{startYear:2027,capacity:'unlimited',years:3,projections:false},
+  scheduled:[{id:'obsolete-output'}],
+});
+
+test('downloaded plans restore user choices and settings without trusting the exported schedule',()=>{
+  const data=downloadedPlan();
+  const imported=importPlanSettings(JSON.parse(JSON.stringify(data)),courses,rules);
+  assert.deepEqual(imported,{
+    targets:data.targets, completed:data.alreadyStudied, choices:data.choices,
+    semesterChoices:data.semesterChoices, met:data.backgroundMarkedMet, ...data.settings, planningVersion,
+  });
+  delete data.semesterChoices;
+  assert.deepEqual(importPlanSettings(data,courses,rules).semesterChoices,{});
+});
+
+test('invalid uploaded plans are rejected instead of silently discarding selections',()=>{
+  for(const value of [null,[],{}, {format:'unknown'}]) assert.throws(()=>importPlanSettings(value,courses,rules));
+  for(const patch of [
+    {targets:['missing']}, {alreadyStudied:'bad'}, {choices:{'1MA036:99':0}},
+    {semesterChoices:{'1MA036':99}}, {backgroundMarkedMet:['unknown requirement']},
+    {settings:{...downloadedPlan().settings,capacity:null}},
+    {settings:{...downloadedPlan().settings,projections:'false'}},
+  ]) assert.throws(()=>importPlanSettings({...downloadedPlan(),...patch},courses,rules));
+});
 
 test('saved targets, exact prerequisites, completed courses and explicit mode survive reload',()=>{
   const saved={targets:['1MA332','1MA080'],completed:['1MA007'],choices:{'1MA036:0':1},semesterChoices:{'1MA080':3,'1MA036':1},met:['Linear Algebra II'],startYear:2027,capacity:10,years:3,projections:false,planningVersion};

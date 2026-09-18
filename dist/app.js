@@ -1,9 +1,10 @@
 import { rules, ruleNotes } from './rules.js';
 import { validateCatalogue, dependencyPath, makePlan, offeringsFor, degreeProjectWindow, semesterOptions } from './planner.js';
 import { periodInfo, formatOffering, periodSource } from './calendar.js';
-import { planningVersion, restorePlanSettings } from './settings.js';
+import { planningVersion, restorePlanSettings, importPlanSettings } from './settings.js';
 import { studyPlanView } from './plan-view.js';
 import { assessProgrammePlan } from './programme.js';
+import { previewSemesterMove } from './plan-move.js';
 
 const $ = id => document.getElementById(id);
 const el = (tag, className, text) => { const node = document.createElement(tag); if (className) node.className = className; if (text !== undefined) node.textContent = text; return node; };
@@ -228,22 +229,106 @@ function renderProgrammeAssessment() {
   }
   panel.append(loads);
   panel.append(el('p', '', report.degreeProject.missing ? 'A 30-credit degree project is still needed in an outline-supported semester. Mathematics: semester 3 or 4. Financial Mathematics: semester 4.' : `30-credit degree project placed: ${report.degreeProject.courseIds.map(id => byId.get(id).title).join(', ')}. Its entry requirements still need review.`));
-  if (report.targetPathIncomplete) panel.append(el('p', 'outline-warning', 'Some targets or prerequisites remain unplaced. See the planning decisions below.'));
+  if (report.targetPathIncomplete) panel.append(el('p', 'outline-warning', 'Some targets or prerequisites remain unplaced. See “Needs a planning decision” above.'));
   if (report.unsupportedPlacements.length) {
     const deviations = el('ul');
     for (const placement of report.unsupportedPlacements) deviations.append(el('li', '', `${placement.title}: ${placement.reason}`));
     panel.append(el('p', 'outline-warning', 'Placements needing an individual exception to the outline:'), deviations);
   }
-  const details = el('details'); details.append(el('summary', '', 'Subject credits and degree requirements'));
-  const subjects = Object.entries(report.mainFieldAdvancedCredits).map(([subject, credits]) => `${subject}: ${credits} cr`).join('; ');
-  details.append(el('p', '', `Advanced credits by main field: ${subjects || 'none planned'}. The degree requires at least 60 advanced credits in the chosen main field, including the project. A course listed in several fields counts once toward the 120-credit workload.`));
-  details.append(el('p', '', `${report.basicCredits} basic-level credits planned${report.bridgingCredits ? `, including ${report.bridgingCredits} bridging credits` : ''}. Up to 30 may qualify if they add competence and were not included in the Bachelor’s degree.${report.basicCreditOverload ? ` ${report.basicCreditOverload} basic credits exceed that limit.` : ''}${report.unknownLevelCredits ? ` ${report.unknownLevelCredits} credits have an unverified level.` : ''}`));
-  details.append(el('p', '', 'Tracks are proposed and flexible. Add elective choices to complete the plan, and review track changes, degree inclusion, prior results and formal eligibility with the programme adviser. Course placement does not confirm admission or degree approval.'));
+  const details = el('details', 'degree-requirements'); details.open = true;
+  details.append(el('summary', '', 'Subject credits and degree requirements'));
+  const requirements = el('ul');
+  const addRequirement = (label, text, className = '') => {
+    const item = el('li', className);
+    item.append(el('strong', '', `${label}: `), document.createTextNode(text));
+    requirements.append(item);
+  };
+  const subjects = Object.entries(report.mainFieldAdvancedCredits);
+  if (!subjects.length) addRequirement('Advanced credits by main field', 'none planned.');
+  for (const [subject, credits] of subjects) addRequirement(subject, `${credits} advanced credits planned.`);
+  addRequirement('Main-field requirement', 'At least 60 advanced credits in the chosen main field, including the degree project.');
+  addRequirement('Credit counting', 'A course listed in several fields counts once toward the 120-credit workload.');
+  addRequirement('Basic-level credits', `${report.basicCredits} planned${report.bridgingCredits ? `, including ${report.bridgingCredits} bridging credits` : ''}. Up to 30 may qualify if they add competence and were not included in the Bachelor’s degree.`);
+  if (report.basicCreditOverload) addRequirement('Basic-level limit exceeded', `${report.basicCreditOverload} credits exceed the limit.`, 'outline-warning');
+  if (report.unknownLevelCredits) addRequirement('Unverified course levels', `${report.unknownLevelCredits} credits have an unverified level.`, 'outline-warning');
+  addRequirement('Tracks and electives', 'Tracks are proposed and flexible. Add elective choices to complete the plan.');
+  addRequirement('Adviser review', 'Review track changes, degree inclusion, prior results and formal eligibility with the programme adviser. Course placement does not confirm admission or degree approval.');
+  details.append(requirements);
   details.append(sourceLink(report.sources.outline, 'Programme outline ↗'), sourceLink(report.sources.syllabus, 'Programme syllabus ↗'));
   panel.append(details);
 }
 
+let timelineDrag = null;
+function clearTimelineDrag() {
+  timelineDrag = null;
+  $('timeline-feedback').classList.remove('drag-feedback');
+  for (const column of $('timeline').querySelectorAll('.semester')) {
+    column.classList.remove('drop-allowed', 'drop-blocked', 'drop-active');
+    column.querySelector('.drop-hint').textContent = '';
+  }
+}
+function makeCourseDraggable(item, id) {
+  item.draggable = true;
+  item.setAttribute('aria-describedby', 'timeline-help');
+  item.addEventListener('dragstart', event => {
+    const moves = new Map();
+    for (const column of $('timeline').querySelectorAll('.semester')) {
+      const semester = Number(column.dataset.semester);
+      const move = previewSemesterMove(courses, path, completed, { startYear, capacity, projections, years, semesterChoices }, plan, id, semester);
+      moves.set(semester, move);
+      column.classList.add(move.allowed ? 'drop-allowed' : 'drop-blocked');
+      column.querySelector('.drop-hint').textContent = move.allowed ? 'Drop here' : 'Move unavailable';
+    }
+    timelineDrag = { id, moves };
+    $('timeline-feedback').classList.add('drag-feedback');
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', id);
+    $('timeline-feedback').textContent = `Moving ${byId.get(id).title}. Highlighted semesters can accept this course.`;
+  });
+  item.addEventListener('dragend', () => {
+    if (timelineDrag) $('timeline-feedback').textContent = 'Move cancelled. Your plan is unchanged.';
+    clearTimelineDrag();
+  });
+}
+function makeSemesterDropTarget(column, semester) {
+  column.dataset.semester = semester;
+  column.append(el('p', 'drop-hint'));
+  column.addEventListener('dragover', event => {
+    if (!timelineDrag) return;
+    event.preventDefault();
+    const move = timelineDrag.moves.get(semester);
+    event.dataTransfer.dropEffect = move.allowed ? 'move' : 'none';
+    column.classList.toggle('drop-active', move.allowed);
+    $('timeline-feedback').textContent = move.allowed
+      ? `Move ${byId.get(timelineDrag.id).title} to semester ${semester}.`
+      : `Cannot move to semester ${semester}. ${move.reason}`;
+  });
+  column.addEventListener('dragleave', event => {
+    if (!column.contains(event.relatedTarget)) column.classList.remove('drop-active');
+  });
+  column.addEventListener('drop', event => {
+    if (!timelineDrag) return;
+    event.preventDefault();
+    const { id, moves } = timelineDrag;
+    const move = moves.get(semester);
+    clearTimelineDrag();
+    if (!move.allowed) {
+      $('timeline-feedback').textContent = `Course not moved. ${move.reason}`;
+      return;
+    }
+    semesterChoices = move.semesterChoices;
+    render();
+    const warning = move.offering.exceptionalProject ? ' Exceptional project placement; adviser review needed.'
+      : move.offering.outsideOutline ? ' Outside the programme outline; review required.' : '';
+    $('timeline-feedback').textContent = `${byId.get(id).title} moved to semester ${semester}. Dependent courses and workload updated.${warning}`;
+    document.getElementById(`plan-${id}`)?.focus({ preventScroll: true });
+  });
+}
+
 function renderPlan() {
+  timelineDrag = null;
+  $('timeline-feedback').classList.remove('drag-feedback');
+  $('timeline-feedback').textContent = '';
   const timeline = $('timeline'); timeline.replaceChildren();
   const view = studyPlanView(plan, targets, completed, startYear);
   $('target-outcomes').replaceChildren();
@@ -262,6 +347,7 @@ function renderPlan() {
     const semester = info.index;
     const column = el('section', `semester${info.beyondProgramme ? ' extended-semester' : ''}`);
     column.append(el('h3', '', `${info.term} ${info.year}`), el('p', 'semester-subtitle', `Semester ${info.semester} · ${info.semesterDates.join(' – ')}${info.semesterDatesPublished ? '' : ' (calculated)'}`));
+    makeSemesterDropTarget(column, info.semester);
     if (info.beyondProgramme) column.append(el('p', 'extension-label', 'Beyond the standard 2-year programme'));
     const semesterReservations = [...plan.scheduled].filter(([, offering]) => offering.semesterOnly && Math.floor(offering.periods[0]/2) === semester);
     if (semesterReservations.length) {
@@ -271,6 +357,7 @@ function renderPlan() {
         projectedCount++;
         const item = button('', 'plan-course projected', () => { selectCourse(id); $('details').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
         item.id = `plan-${id}`;
+        makeCourseDraggable(item, id);
         item.append(el('small', '', `${id} · ${byId.get(id).credits} cr this semester`), el('strong', '', byId.get(id).title), el('span', '', 'Semester from outline · Exact periods not yet planned'));
         if (offering.chosenSemester) item.append(el('span', '', `Your choice: semester ${offering.chosenSemester}`));
         if (offering.outsideOutline) item.append(el('span', 'outline-warning', 'Outside listed programme semester · Review required'));
@@ -292,6 +379,7 @@ function renderPlan() {
         if (!offering.confirmed && position === 0) projectedCount++;
         const item = button('', `plan-course${offering.confirmed ? '' : ' projected'}${targets.has(id) ? ' plan-target' : ''}`, () => { selectCourse(id); $('details').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
         if (position === 0) item.id = `plan-${id}`;
+        makeCourseDraggable(item, id);
         item.append(el('small', '', `${id} · ${offering.loads[position]} cr this period`), el('strong', '', byId.get(id).title), el('span', '', offering.confirmed ? 'Published offering' : 'Provisional offering'));
         if (offering.exceptionalProject) item.append(el('span', 'outline-warning', 'Semester 3 exception · Adviser review needed'));
         if (offering.chosenSemester) item.append(el('span', '', `Your choice: semester ${offering.chosenSemester}`));
@@ -368,6 +456,36 @@ function exportPlan() {
   const a = el('a'); a.href = url; a.download = 'uppsala-mathematics-study-plan.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url),1000);
 }
 
+async function uploadPlan(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  $('import').disabled = true;
+  try {
+    if (file.size > 5 * 1024 * 1024) throw new Error('Choose a plan file smaller than 5 MB.');
+    let payload;
+    try { payload = JSON.parse(await file.text()); }
+    catch { throw new Error('The file could not be read as JSON. Choose a downloaded Course Atlas plan.'); }
+    const data = importPlanSettings(payload, courses, rules);
+    const nextTargets = new Set(data.targets), nextCompleted = new Set(data.completed);
+    // Check the imported choices against today's catalogue before replacing state.
+    const nextPath = dependencyPath(nextTargets, nextCompleted, data.choices);
+    makePlan(courses, nextPath, nextCompleted, data);
+    targets = nextTargets; completed = nextCompleted;
+    choices = data.choices; semesterChoices = data.semesterChoices; met = new Set(data.met);
+    startYear = data.startYear; capacity = data.capacity; projections = data.projections; years = data.years;
+    selected = targets.values().next().value ?? courses[0].id;
+    $('start-year').value = startYear; $('plan-years').value = years;
+    $('capacity').value = capacity; $('projections').checked = projections;
+    render(true);
+    $('import-status').textContent = `Loaded ${file.name}. Your selections have been restored and the timeline recalculated using the current catalogue.`;
+  } catch (error) {
+    $('import-status').textContent = `Plan not loaded: ${error.message}`;
+  } finally {
+    event.target.value = '';
+    $('import').disabled = false;
+  }
+}
+
 function registerAgentTools() {
   if (!document.modelContext?.registerTool) return;
   const lifecycle = new AbortController();
@@ -394,13 +512,15 @@ async function init() {
   $('projections').addEventListener('change', event => { projections = event.target.checked; render(); });
   $('zoom-in').addEventListener('click', () => zoom(1.2)); $('zoom-out').addEventListener('click', () => zoom(1/1.2)); $('fit').addEventListener('click', fit);
   $('export').addEventListener('click', exportPlan);
+  $('import').addEventListener('click', () => $('plan-file').click());
+  $('plan-file').addEventListener('change', uploadPlan);
   let drag;
   const viewport = $('viewport');
   viewport.addEventListener('pointerdown', event => { if (event.target.closest('button') || event.button !== 0) return; drag = { x: event.clientX-view.x, y: event.clientY-view.y }; viewport.setPointerCapture(event.pointerId); viewport.classList.add('dragging'); });
   viewport.addEventListener('pointermove', event => { if (drag) { view.x = event.clientX-drag.x; view.y = event.clientY-drag.y; transform(); } });
   const stopDrag = () => { drag = null; viewport.classList.remove('dragging'); };
   viewport.addEventListener('pointerup', stopDrag); viewport.addEventListener('pointercancel', stopDrag); viewport.addEventListener('lostpointercapture', stopDrag);
-  viewport.addEventListener('keydown', event => { if (event.key === 'Escape') stopDrag(); });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') stopDrag(); });
   $('nodes').addEventListener('focusin', event => {
     const node = event.target.closest('.node'); if (!node) return;
     const x = parseFloat(node.style.left), y = parseFloat(node.style.top);

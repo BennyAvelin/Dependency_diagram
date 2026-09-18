@@ -19,3 +19,52 @@
 
 .semester-reservations{border:1px dashed #bbab6e;border-radius:8px;padding:12px;margin:12px 0;background:#faf9ef}.semester-reservations h4{font-size:14px;margin:0 0 10px;color:#715a26}.semester-reservations .empty-note{font-size:13px;line-height:1.6}
 .planning-disclaimer{margin:0 0 20px;padding:16px 20px;border:1px solid #d7e1d9;border-left:4px solid #45766b;border-radius:8px;background:#fff;color:#29443c;font-size:1rem;line-height:1.6}.planning-disclaimer a{color:#2c6b49;text-underline-offset:3px}
+
+/* Keep explanatory text readable independently of the wide planning workspace. */
+.planning-disclaimer,
+.heading p,
+.plan-heading p,
+.map-scope,
+.planning-mode,
+.plan-explainer,
+.review-intro,
+.planning-note,
+.detail-description,
+.eligibility-course p,
+.programme-assessment > p,
+.programme-assessment > ul,
+.programme-assessment details p,
+.degree-requirements > ul,
+.unplaced-row > span {
+  max-inline-size: 75ch;
+}
+
+.degree-requirements{margin-top:20px;padding-top:18px;border-top:1px solid #d7e1d9;font-size:14px}
+.degree-requirements > summary{font-size:16px;color:#335c32}
+.degree-requirements > ul{padding-inline-start:24px;margin-block:14px}
+.degree-requirements li{padding-inline-start:4px;margin-block:12px}
+
+.plan-course[draggable=true]{cursor:grab}
+.plan-course[draggable=true]:active{cursor:grabbing}
+.semester{min-width:0;border-radius:8px}
+.semester.drop-allowed{outline:2px dashed #45766b;outline-offset:5px}
+.semester.drop-active{outline-style:solid;background:#e8f6df}
+.drop-hint{visibility:hidden;min-height:1.5em;font-size:14px;line-height:1.5;margin:10px 0;color:#335c32}
+.drop-allowed > .drop-hint,.drop-blocked > .drop-hint{visibility:visible}
+.drop-blocked > .drop-hint{color:#896128}
+.timeline-feedback{font-size:14px;line-height:1.6;max-inline-size:75ch;color:#335c32}
+.timeline-feedback:empty{display:none}
+.timeline-feedback.drag-feedback{position:fixed;z-index:20;inset-inline:16px;bottom:16px;margin:0 auto;padding:12px 16px;max-height:25vh;overflow:auto;background:#fff;border:1px solid #45766b;border-radius:8px;box-shadow:0 4px 16px #10272426;pointer-events:none}
+
+.usage-guide{margin-block:24px;padding-block:20px;border-block:1px solid #d7e1d9}
+.usage-guide > h2{font-size:18px;margin-bottom:18px}
+.guide-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;list-style:none;padding:0;margin:0}
+.guide-steps h3{font-size:16px;line-height:1.5;margin:0 0 8px;max-inline-size:45ch}
+.guide-steps h3 span{display:block;font-size:14px;color:#45766b;margin-bottom:4px}
+.guide-steps p{font-size:16px;line-height:1.6;margin:0;max-inline-size:45ch;color:#506748}
+.guide-steps a{color:#2c6b49;text-underline-offset:3px}
+@media(max-width:900px){.guide-steps{grid-template-columns:1fr;gap:20px}.guide-steps p,.guide-steps h3{max-inline-size:65ch}}
+@media print{.usage-guide{display:none}}
+.plan-actions{display:flex;flex-wrap:wrap;gap:10px}
+#import-status:empty{display:none}
+@media print{#import-help,#import-status{display:none}}
