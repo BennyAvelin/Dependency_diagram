@@ -15,6 +15,8 @@ let targets = new Set(), completed = new Set(), choices = {}, semesterChoices = 
 let selected = '1MA338', startYear = 2026, capacity = 15, projections = true, years = 2;
 let view = { x: 20, y: 20, scale: 1 }, world = { width: 1000, height: 500 };
 let persistence = true;
+const phoneLayout = matchMedia('(max-width: 800px)');
+let visibleSemester = 1, drawerOpener = null;
 const svgNS = 'http://www.w3.org/2000/svg';
 
 function save() {
@@ -42,7 +44,15 @@ function setTarget(id, enabled = !targets.has(id)) {
   $('announcement').textContent = `${byId.get(id).title} ${enabled ? 'added to' : 'removed from'} targets.`;
 }
 function restoreFocus(id) { if (id) document.getElementById(id)?.focus({ preventScroll: true }); }
-function selectCourse(id) { const focusId = document.activeElement?.id; selected = id; renderDetails(); renderCatalogue(); renderMap(false); restoreFocus(focusId); }
+function selectCourse(id, showDetails = true) {
+  const focusId = document.activeElement?.id;
+  selected = id;
+  renderDetails(); renderCatalogue(); renderMap(false); renderPrerequisites(); restoreFocus(focusId);
+  if (showDetails) {
+    if (phoneLayout.matches) openCourseDrawer();
+    else $('details').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
 function setCompleted(id, enabled) { enabled ? completed.add(id) : completed.delete(id); render(true); }
 function optionLabel(option) { return option.course ? `${byId.get(option.course).title} (${option.course})` : option.external; }
 function offeringLabel(c) {
@@ -58,7 +68,7 @@ function semesterControl(course, location) {
   const chosen = semesterChoices[course.id];
   if (options.length < 2 && !chosen) return null;
   const wrapper = el('div', 'semester-choice');
-  const label = el('label', '', location === 'plan' ? course.title : 'Take this course in');
+  const label = el('label', '', location === 'plan' ? course.title : 'Change semester');
   const select = el('select'); select.id = `semester-${location}-${course.id}`; label.htmlFor = select.id;
   const automatic = el('option', '', degreeProjectWindow(course) ? 'Automatic · Semester 4 (final semester)' : 'Automatic · Follow programme outline'); automatic.value = ''; select.append(automatic);
   for (const option of options) {
@@ -73,6 +83,8 @@ function semesterControl(course, location) {
   select.addEventListener('change', () => {
     if (select.value) semesterChoices[course.id] = Number(select.value); else delete semesterChoices[course.id];
     render();
+    const placed = plan.scheduled.get(course.id);
+    if (phoneLayout.matches && placed) { visibleSemester = Math.floor(placed.periods[0] / 2) + 1; updateVisibleSemester(); }
     $('announcement').textContent = `${course.title}: ${semesterChoices[course.id] ? `semester ${semesterChoices[course.id]} selected` : 'automatic placement restored'}. Study plan updated.`;
   });
   wrapper.append(label, select);
@@ -82,7 +94,7 @@ function semesterControl(course, location) {
 
 function renderTargets() {
   $('targets').replaceChildren();
-  if (!targets.size) $('targets').append(el('span', 'empty-note', 'Add courses from the catalogue below.'));
+  if (!targets.size) $('targets').append(el('span', 'empty-note', 'Choose courses to add to your plan.'));
   for (const id of targets) $('targets').append(button(`${byId.get(id).title} ×`, 'target-chip', () => setTarget(id, false), `Remove ${byId.get(id).title} from targets`));
   $('clear').disabled = !targets.size;
 }
@@ -170,8 +182,10 @@ function transform() {
 }
 function fit() {
   const viewport = $('viewport');
+  if (!viewport.clientWidth || !viewport.clientHeight) return;
   view.scale = Math.min(1, Math.max(.15, Math.min((viewport.clientWidth - 40) / world.width, (viewport.clientHeight - 50) / world.height)));
-  view.x = (viewport.clientWidth - world.width * view.scale) / 2;
+  if (phoneLayout.matches) view.scale = Math.max(.9, view.scale);
+  view.x = phoneLayout.matches ? 16 : (viewport.clientWidth - world.width * view.scale) / 2;
   view.y = (viewport.clientHeight - world.height * view.scale) / 2;
   transform();
 }
@@ -217,6 +231,7 @@ function renderMap(refit) {
 
 function renderProgrammeAssessment() {
   const report = assessProgrammePlan(courses, plan, { completed, targets });
+  renderDegreeRequirements(report);
   const panel = $('programme-assessment'); panel.replaceChildren();
   if (!targets.size) return;
   panel.append(el('h3', '', 'Programme outline check'));
@@ -235,15 +250,30 @@ function renderProgrammeAssessment() {
     for (const placement of report.unsupportedPlacements) deviations.append(el('li', '', `${placement.title}: ${placement.reason}`));
     panel.append(el('p', 'outline-warning', 'Placements needing an individual exception to the outline:'), deviations);
   }
-  const details = el('details', 'degree-requirements'); details.open = true;
-  details.append(el('summary', '', 'Subject credits and degree requirements'));
+}
+
+function renderDegreeRequirements(report) {
+  const overview = $('degree-requirements'); overview.replaceChildren();
+  const title = el('h3', '', 'Degree requirements'); title.id = 'degree-title';
+  overview.append(title, el('p', 'degree-intro', 'Build your plan around these requirements—not just a route to your target courses.'));
+  const grid = el('div', 'degree-essentials');
+  const requirement = (amount, label, status) => {
+    const card = el('div', 'degree-essential');
+    card.append(el('strong', '', amount), el('span', '', label), el('p', '', status)); grid.append(card);
+  };
+  requirement('120 credits', 'Total programme workload', `${report.programmeCredits} planned in semesters 1–4 · 30 credits per semester`);
+  const subjects = Object.entries(report.mainFieldAdvancedCredits);
+  requirement('At least 60', 'Advanced credits in your main field, including the degree project', subjects.length ? subjects.map(([subject, credits]) => `${subject}: ${credits} planned`).join(' · ') : 'No advanced main-field credits planned yet');
+  requirement('30 credits', 'Degree project', report.degreeProject.missing ? 'Still needed in an outline-supported semester' : 'Placed in your plan · Entry requirements need review');
+  overview.append(grid, el('p', 'degree-caveat', 'Planning totals do not confirm degree eligibility. Verify course inclusion, prior studies and formal requirements with the programme adviser.'));
+  const details = el('details', 'degree-requirements');
+  details.append(el('summary', '', 'Credit classifications & programme rules'));
   const requirements = el('ul');
   const addRequirement = (label, text, className = '') => {
     const item = el('li', className);
     item.append(el('strong', '', `${label}: `), document.createTextNode(text));
     requirements.append(item);
   };
-  const subjects = Object.entries(report.mainFieldAdvancedCredits);
   if (!subjects.length) addRequirement('Advanced credits by main field', 'none planned.');
   for (const [subject, credits] of subjects) addRequirement(subject, `${credits} advanced credits planned.`);
   addRequirement('Main-field requirement', 'At least 60 advanced credits in the chosen main field, including the degree project.');
@@ -255,7 +285,7 @@ function renderProgrammeAssessment() {
   addRequirement('Adviser review', 'Review track changes, degree inclusion, prior results and formal eligibility with the programme adviser. Course placement does not confirm admission or degree approval.');
   details.append(requirements);
   details.append(sourceLink(report.sources.outline, 'Programme outline ↗'), sourceLink(report.sources.syllabus, 'Programme syllabus ↗'));
-  panel.append(details);
+  overview.append(details);
 }
 
 let timelineDrag = null;
@@ -335,7 +365,8 @@ function renderPlan() {
   for (const target of view.targets) {
     const row = button('', `target-outcome ${target.status}`, () => {
       const card = document.getElementById(`plan-${target.id}`);
-      selectCourse(target.id);
+      if (phoneLayout.matches) { selectCourse(target.id); return; }
+      selectCourse(target.id, false);
       if (card) { card.scrollIntoView({ behavior: 'smooth', block: 'center' }); card.focus({ preventScroll: true }); }
       else $('details').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
@@ -355,12 +386,13 @@ function renderPlan() {
       pending.append(el('h4', '', 'Schedule not yet published'));
       for (const [id, offering] of semesterReservations) {
         projectedCount++;
-        const item = button('', 'plan-course projected', () => { selectCourse(id); $('details').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
+        const item = button('', 'plan-course projected', () => selectCourse(id));
         item.id = `plan-${id}`;
         makeCourseDraggable(item, id);
         item.append(el('small', '', `${id} · ${byId.get(id).credits} cr this semester`), el('strong', '', byId.get(id).title), el('span', '', 'Semester from outline · Exact periods not yet planned'));
         if (offering.chosenSemester) item.append(el('span', '', `Your choice: semester ${offering.chosenSemester}`));
         if (offering.outsideOutline) item.append(el('span', 'outline-warning', 'Outside listed programme semester · Review required'));
+        item.append(el('span', 'card-action', 'Details & change semester →'));
         pending.append(item);
       }
       pending.append(el('p', 'empty-note', 'Workload is temporarily split equally across the semester for capacity estimates. Confirm the teaching periods before finalising your plan.'));
@@ -377,13 +409,14 @@ function renderPlan() {
         const position = offering.periods.indexOf(index); if (position === -1 || offering.semesterOnly) continue;
         count++;
         if (!offering.confirmed && position === 0) projectedCount++;
-        const item = button('', `plan-course${offering.confirmed ? '' : ' projected'}${targets.has(id) ? ' plan-target' : ''}`, () => { selectCourse(id); $('details').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
+        const item = button('', `plan-course${offering.confirmed ? '' : ' projected'}${targets.has(id) ? ' plan-target' : ''}`, () => selectCourse(id));
         if (position === 0) item.id = `plan-${id}`;
         makeCourseDraggable(item, id);
-        item.append(el('small', '', `${id} · ${offering.loads[position]} cr this period`), el('strong', '', byId.get(id).title), el('span', '', offering.confirmed ? 'Published offering' : 'Provisional offering'));
+        item.append(el('small', '', `${id} · ${byId.get(id).credits} cr total${offering.periods.length > 1 ? ` · ${offering.loads[position]} cr this period` : ''}`), el('strong', '', byId.get(id).title), el('span', '', offering.confirmed ? 'Published offering' : 'Provisional offering'));
         if (offering.exceptionalProject) item.append(el('span', 'outline-warning', 'Semester 3 exception · Adviser review needed'));
         if (offering.chosenSemester) item.append(el('span', '', `Your choice: semester ${offering.chosenSemester}`));
         if (offering.outsideOutline) item.append(el('span', 'outline-warning', `Outside outline semester ${offering.outlineSemesters.join(' / ')} · Review required`));
+        item.append(el('span', 'card-action', 'Details & change semester →'));
         item.title = `${formatOffering(startYear,offering)} · ${offering.dates} · ${offering.loadBasis}`; period.append(item);
       }
       if (!count) period.append(el('p', 'empty-period', semesterReservations.length ? 'Semester reservations above have no exact period yet' : 'No selected course scheduled in this period'));
@@ -415,6 +448,8 @@ function renderPlan() {
   const extension = view.extended ? `Automatically extended from ${years} to ${plan.years} academic years to include later scheduled courses. ` : '';
   $('planning-mode').textContent = extension + (projections ? `Showing ${plan.years} academic years using published offerings and provisional repeats. Dashed course cards need confirmation.` : 'Published offerings only. Later semesters may be empty because their course instances have not yet been published.') + (plan.unscheduled.length ? ` Unplaced courses were checked across ${plan.searchYears} academic years.` : '');
   $('export').disabled = !targets.size;
+  renderSemesterNavigation(view.semesters);
+  renderProgress();
 }
 function renderReview() {
   const background = $('background'); background.replaceChildren();
@@ -442,12 +477,13 @@ function renderReview() {
 function updateReviewSummary() {
   const count = new Set(path.external.filter(r => !met.has(r.label)).map(r => r.label)).size;
   $('review-summary').textContent = `Entry requirements to review · ${count} background items unchecked · formal eligibility requires review`;
+  renderProgress();
 }
 function render(refit = false) {
   const focusId = document.activeElement?.id;
   path = dependencyPath(targets, completed, choices);
   plan = makePlan(courses, path, completed, { startYear, capacity, projections, years, semesterChoices });
-  renderTargets(); renderCatalogue(); renderDetails(); renderMap(refit); renderPlan(); save(); restoreFocus(focusId);
+  renderTargets(); renderCatalogue(); renderDetails(); renderMap(refit); renderPlan(); renderPrerequisites(); save(); restoreFocus(focusId);
 }
 function exportPlan() {
   const payload = { format: 'uppsala-course-atlas-plan-v2', generatedAt: new Date().toISOString(), outline: catalogue.outlineSource, periodSource, sourceCheckedOn: catalogue.checkedOn, targets: [...targets], alreadyStudied: [...completed], choices, semesterChoices, backgroundMarkedMet: [...met], settings: { startYear, capacity, projections, years, displayedYears: plan.years, searchYears: plan.searchYears }, targetOutcomes: studyPlanView(plan, targets, completed, startYear).targets, scheduled: [...plan.scheduled].map(([id,o]) => ({ id, title: byId.get(id).title, ...o, periods: o.periods.map(p => ({ ...periodInfo(startYear,p), ...(o.semesterOnly ? { estimatedReservation: true, start: null, end: null } : {}) })) })), unplaced: plan.unscheduled, note: 'A conditional planning suggestion, not an admission or degree assessment. Formal eligibility, future offerings and timetable conflicts require review.' };
@@ -484,6 +520,155 @@ async function uploadPlan(event) {
     event.target.value = '';
     $('import').disabled = false;
   }
+}
+
+// Mobile views reuse the same course details and scheduling state as desktop.
+function setMobileView(name, focus = true) {
+  if (!['courses', 'plan', 'prerequisites'].includes(name)) return;
+  document.body.dataset.mobileView = name;
+  for (const item of document.querySelectorAll('[data-view]')) {
+    if (item.dataset.view === name) item.setAttribute('aria-current', 'page');
+    else item.removeAttribute('aria-current');
+  }
+  if (name === 'prerequisites') renderPrerequisites();
+  if (focus && phoneLayout.matches) {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    $(name === 'courses' ? 'courses-title' : name === 'plan' ? 'plan-title' : 'prerequisite-title').focus({ preventScroll: true });
+  }
+}
+function openCourseDrawer() {
+  const drawer = $('course-drawer');
+  if (!drawer.open) {
+    drawerOpener = { element: document.activeElement, id: document.activeElement?.id };
+    drawer.append($('details'));
+    drawer.showModal();
+  }
+  drawer.scrollTop = 0;
+  $('close-drawer').focus({ preventScroll: true });
+}
+function closeCourseDrawer() {
+  $('course-drawer').close();
+}
+function revealPlanSection(id) {
+  if (phoneLayout.matches) setMobileView('plan', false);
+  const section = $(id);
+  const disclosure = section.closest('details');
+  if (disclosure) disclosure.open = true;
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  section.setAttribute('tabindex', '-1'); section.focus({ preventScroll: true });
+}
+function renderProgress() {
+  const panel = $('plan-progress');
+  panel.replaceChildren();
+  if (!targets.size) {
+    panel.append(el('h3', '', 'Your study plan starts here'), el('p', '', 'Choose the courses you want to study. Their prerequisites will be added to your plan.'));
+    panel.append(button('Choose courses →', 'secondary-button', () => {
+      if (phoneLayout.matches) setMobileView('courses');
+      else { $('search').scrollIntoView({ behavior: 'smooth', block: 'center' }); $('search').focus({ preventScroll: true }); }
+    }));
+    return;
+  }
+  const report = assessProgrammePlan(courses, plan, { completed, targets });
+  panel.append(el('h3', '', `${report.programmeCredits} / 120 credits planned`));
+  const progress = el('progress'); progress.max = 120; progress.value = Math.min(120, report.programmeCredits); progress.setAttribute('aria-label', 'Planned credits in semesters 1 to 4'); panel.append(progress);
+  panel.append(el('p', '', report.creditGap ? `${report.creditGap} credits still to allocate in semesters 1–4.` : report.creditOverload ? `${report.creditOverload} credits above the four-semester workload.` : 'Four-semester credit total reached. Check semester loads and degree requirements.'));
+  const actions = el('div', 'progress-actions');
+  if (plan.unscheduled.length) actions.append(button(`${plan.unscheduled.length} unplaced courses · Resolve →`, '', () => revealPlanSection('unplaced')));
+  const backgroundCount = new Set(path.external.filter(r => !met.has(r.label)).map(r => r.label)).size;
+  actions.append(button(`${backgroundCount ? `${backgroundCount} background requirements unchecked` : 'Review formal entry requirements'} →`, '', () => revealPlanSection('review-summary')));
+  actions.append(button(report.degreeProject.missing ? 'Degree project still needed · Browse →' : 'Review programme fit →', '', () => {
+    if (!report.degreeProject.missing) { revealPlanSection('programme-assessment'); return; }
+    $('track').value = 'all'; $('search').value = 'Degree Project E'; renderCatalogue();
+    if (phoneLayout.matches) setMobileView('courses');
+    else { $('search').scrollIntoView({ behavior: 'smooth', block: 'center' }); $('search').focus({ preventScroll: true }); }
+  }));
+  if (report.semesters.some(item => item.overload) || report.unsupportedPlacements.length) actions.append(button('Semester load or placement needs review →', '', () => revealPlanSection('programme-assessment')));
+  panel.append(actions, el('p', '', 'Planned workload, not approved degree credits. Prior-study markers are excluded.'));
+}
+function renderSemesterNavigation(semesters) {
+  visibleSemester = Math.max(1, Math.min(visibleSemester, semesters.length));
+  const select = $('visible-semester'); select.replaceChildren();
+  for (const info of semesters) {
+    const option = el('option', '', `${info.semester} · ${info.term} ${info.year}`);
+    option.value = info.semester; select.append(option);
+  }
+  updateVisibleSemester();
+}
+function updateVisibleSemester() {
+  $('visible-semester').value = visibleSemester;
+  for (const column of $('timeline').children) column.classList.toggle('mobile-active', Number(column.dataset.semester) === visibleSemester);
+  $('semester-previous').disabled = visibleSemester <= 1;
+  $('semester-next').disabled = visibleSemester >= $('visible-semester').options.length;
+}
+function renderPrerequisites() {
+  const picker = $('prerequisite-course'); picker.replaceChildren();
+  for (const c of [...courses].sort((a, b) => a.title.localeCompare(b.title))) {
+    const option = el('option', '', `${c.title} · ${c.id}`); option.value = c.id; picker.append(option);
+  }
+  picker.value = selected;
+  const list = $('prerequisite-list'); list.replaceChildren();
+  if (!byId.has(selected)) return;
+  const route = dependencyPath(new Set([selected]), completed, choices);
+  if (completed.has(selected)) list.append(el('p', 'review-intro', 'This course is marked as already studied, so its prerequisite route is no longer expanded. You can change that in course details.'));
+  const required = [...route.included].filter(id => id !== selected).sort((a, b) => route.levels.get(a) - route.levels.get(b));
+  list.append(el('h3', '', 'Course prerequisites'));
+  if (!required.length) list.append(el('p', 'review-intro', 'No additional catalogue courses on this selected route. Check background studies and official entry conditions.'));
+  for (const id of required) {
+    const c = byId.get(id), row = el('div', 'prerequisite-row');
+    const label = el('label'), check = el('input'); check.type = 'checkbox'; check.checked = completed.has(id); check.id = `prerequisite-met-${id}`;
+    check.setAttribute('aria-label', `Requirement met: ${c.title}`);
+    check.addEventListener('change', () => setCompleted(id, check.checked));
+    label.append(check, el('span', '', c.title)); row.append(label);
+    const needs = route.edges.filter(edge => edge.from === id).map(edge => `${byId.get(edge.to).title} (${edge.kind === 'parallel' ? 'parallel study allowed' : edge.kind === 'participation' ? 'prior participation' : 'completed course'})`);
+    row.append(el('p', '', completed.has(id) ? 'Marked as already studied / requirement met' : `Needed for ${needs.join('; ')}`));
+    row.append(button('View course details →', 'text-button', () => selectCourse(id), `View details for ${c.title}`));
+    list.append(row);
+  }
+  list.append(el('h3', '', 'Background studies'));
+  const background = new Map();
+  for (const item of route.external) {
+    if (!background.has(item.label)) background.set(item.label, []);
+    background.get(item.label).push(item);
+  }
+  if (!background.size) list.append(el('p', 'review-intro', 'No additional named background studies on this route.'));
+  let index = 0;
+  for (const [text, requirements] of background) {
+    const row = el('div', 'prerequisite-row'), label = el('label'), check = el('input');
+    check.type = 'checkbox'; check.checked = met.has(text); check.id = `prerequisite-background-${index++}`;
+    check.addEventListener('change', () => { check.checked ? met.add(text) : met.delete(text); render(); });
+    label.append(check, el('span', '', text)); row.append(label);
+    row.append(el('p', '', requirements.map(item => `${byId.get(item.course).title}: ${item.kind === 'parallel' ? 'parallel study allowed' : item.kind === 'participation' ? 'prior participation' : 'completed course required'}`).join('; ')));
+    list.append(row);
+  }
+  list.append(el('p', 'review-intro', 'These checks are planning notes. Credit totals, subject background and formal eligibility still need review.'), sourceLink(byId.get(selected).source, 'Verify official entry requirements ↗'));
+}
+function initPhoneNavigation() {
+  for (const item of document.querySelectorAll('[data-view]')) item.addEventListener('click', () => setMobileView(item.dataset.view));
+  $('close-drawer').addEventListener('click', closeCourseDrawer);
+  $('course-drawer').addEventListener('close', () => {
+    $('workspace').append($('details'));
+    const opener = drawerOpener?.id ? $(drawerOpener.id) : drawerOpener?.element;
+    if (opener?.isConnected) opener.focus({ preventScroll: true });
+    else document.querySelector('.mobile-navigation [aria-current]')?.focus({ preventScroll: true });
+  });
+  phoneLayout.addEventListener('change', () => { if ($('course-drawer').open) closeCourseDrawer(); fit(); });
+  $('prerequisite-course').addEventListener('change', event => selectCourse(event.target.value, false));
+  $('prerequisite-details').addEventListener('click', () => selectCourse(selected));
+  $('toggle-map').addEventListener('click', () => {
+    const open = document.body.dataset.mapOpen !== 'true';
+    document.body.dataset.mapOpen = String(open);
+    $('toggle-map').setAttribute('aria-expanded', String(open));
+    $('toggle-map').textContent = open ? 'Hide interactive map' : 'Show interactive map'; fit();
+  });
+  $('visible-semester').addEventListener('change', event => { visibleSemester = Number(event.target.value); updateVisibleSemester(); });
+  $('semester-previous').addEventListener('click', () => { visibleSemester--; updateVisibleSemester(); });
+  $('semester-next').addEventListener('click', () => { visibleSemester++; updateVisibleSemester(); });
+  document.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener('click', () => {
+    if (!phoneLayout.matches) return;
+    const destination = link.getAttribute('href').slice(1);
+    setMobileView(destination === 'search' ? 'courses' : 'plan', false);
+    if (destination === 'review-summary') $('review-summary').parentElement.open = true;
+  }));
 }
 
 function registerAgentTools() {
@@ -528,6 +713,7 @@ async function init() {
       view.x = viewport.clientWidth/2-(x+110)*view.scale; view.y = viewport.clientHeight/2-(y+62)*view.scale; transform();
     }
   });
+  initPhoneNavigation();
   render(true); new ResizeObserver(fit).observe(viewport); registerAgentTools();
 }
 init().catch(error => { $('error').hidden = false; $('error').textContent = `Unable to open the planner: ${error.message} Please reload, or use the official programme outline above.`; $('path-summary').textContent = 'Catalogue unavailable'; });

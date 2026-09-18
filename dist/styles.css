@@ -68,3 +68,139 @@
 .plan-actions{display:flex;flex-wrap:wrap;gap:10px}
 #import-status:empty{display:none}
 @media print{#import-help,#import-status{display:none}}
+
+/* A shared planner with a focused phone workspace. */
+[hidden]{display:none!important}
+.mobile-only{display:none}
+#map-area{display:contents}
+.planning-guide{margin:0 0 22px;color:#395b49}
+.planning-guide>summary,.plan-options>summary{cursor:pointer;padding:12px 0;font-size:14px;line-height:1.5}
+.planning-guide[open]>.planning-disclaimer{margin-top:16px}
+.plan-options{margin:18px 0;border-block:1px solid #dfe7e2}
+.plan-options .plan-settings{margin-top:12px}
+.plan-progress{margin-top:22px;background:#102f27;color:#fff;border-radius:10px;padding:20px}
+.plan-progress h3{margin:0 0 10px;font-size:22px;letter-spacing:-.3px}
+.plan-progress p{margin:8px 0;font-size:14px;line-height:1.6;color:#d9e8df}
+.plan-progress progress{display:block;width:100%;height:8px;accent-color:#b7ed8e;margin:12px 0}
+.progress-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.progress-actions button{font-size:14px;line-height:1.4;padding:10px 12px;border:1px solid #6c9180;border-radius:6px;background:#254b3e;color:#fff;text-align:left}
+#course-drawer{padding:0;border:0;border-radius:18px 18px 0 0;color:#162c29;background:white;width:100%;max-width:800px;max-height:92dvh;margin:auto auto 0;overscroll-behavior:contain}
+#course-drawer::backdrop{background:#10272499}
+body:has(#course-drawer[open]){overflow:hidden}
+.drawer-bar{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;background:#fff;padding:12px 20px;border-bottom:1px solid #dfe7e2;font-weight:600}
+.drawer-bar button{border:0;border-radius:6px;padding:12px 18px;background:#eaf4e5;color:#254f32;min-height:44px}
+#course-drawer .details{display:block!important;max-height:none;overflow:visible;border:0;padding:20px 24px 32px}
+#course-drawer .details h2{font-size:26px}
+#course-drawer select{font-size:16px}
+.card-action{display:none}
+@media(max-width:800px){
+  body{padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+  main{padding:18px 16px}
+  .header{min-height:64px;padding:12px 16px;gap:12px}
+  .header .sample{font-size:12px;max-width:125px;padding:5px 9px;line-height:1.4;text-align:center}
+  .brand{font-size:18px;gap:8px}.brand-mark{padding:8px 6px}.header-label{display:none}
+  .heading{margin-bottom:6px}.heading h1{font-size:25px;letter-spacing:-.7px;margin-bottom:4px}
+  .heading .eyebrow,.heading p:last-child,.totals{display:none}
+  .planning-guide{margin-bottom:12px}.planning-guide>summary{font-size:14px}
+  .planning-disclaimer{font-size:16px;padding:14px}.guide-steps{grid-template-columns:1fr}
+  .mobile-only{display:block}
+  .target-strip,.workspace,.study-plan,#prerequisites{display:none}
+  body[data-mobile-view=courses] .target-strip{display:flex;align-items:flex-start;padding:14px}
+  body[data-mobile-view=courses] .workspace{display:block}
+  body[data-mobile-view=plan] .study-plan{display:block}
+  body[data-mobile-view=prerequisites] #prerequisites{display:block}
+  body[data-mobile-view=prerequisites][data-map-open=true] .workspace{display:block;margin-top:16px}
+  .workspace{height:auto;min-height:0;overflow:visible}
+  .workspace>.details{display:none}
+  .catalogue{display:none;max-height:none;border:0}
+  body[data-mobile-view=courses] .catalogue{display:flex}
+  .catalogue-filters{flex-direction:column;padding:0 16px;gap:10px}
+  .catalogue-filters input,.catalogue-filters select{width:100%;font-size:16px;min-height:46px}
+  #course-list{display:block;max-height:none;overflow:visible}
+  .panel-heading{padding:20px 16px 14px}.panel-heading h2{font-size:22px}
+  .course-item{padding:14px}.course-item span{font-size:16px}.course-item small{font-size:12px}
+  .catalogue-row{border-bottom:1px solid #edf1ee;padding-right:14px}
+  .add-target{width:44px;height:44px}.catalogue-note{display:none}.list-help{font-size:14px}
+  #map-area{display:none}
+  body[data-mobile-view=prerequisites][data-map-open=true] #map-area{display:block}
+  .diagram-panel{min-height:0;border-radius:12px;overflow:hidden}
+  #viewport{height:350px;min-height:350px;flex:none}
+  .map-footer{padding:12px}.zoom-controls button{height:44px;min-width:44px}
+  .map-scope{font-size:14px}.map-hint{display:none}
+  .prerequisite-view{background:white;border:1px solid #d7e1d9;border-radius:12px;padding:20px 16px}
+  .prerequisite-view h2{font-size:24px;margin-bottom:20px}
+  .prerequisite-view label{display:block;font-size:14px;margin-bottom:8px}
+  .prerequisite-view select{font-size:16px;min-height:48px}
+  .prerequisite-view .secondary-button{white-space:normal;line-height:1.5;width:100%}
+  .prerequisite-view h3{font-size:18px;margin:24px 0 12px}
+  .prerequisite-row{padding:14px 0;border-bottom:1px solid #e2e9e5}
+  .prerequisite-row label{display:flex;align-items:flex-start;gap:12px;font-size:16px;line-height:1.5;margin:0}
+  .prerequisite-row input{width:22px;height:22px;flex:none;accent-color:#2f7149;margin:2px 0}
+  .prerequisite-row p{font-size:14px;color:#506748;line-height:1.6;margin:8px 0 0 34px}
+  .prerequisite-row .text-button{font-size:14px;min-height:44px;margin-left:24px}
+  #toggle-map{margin-top:22px}
+  .study-plan{margin:0;padding:20px 16px}
+  .plan-heading{display:block}.plan-heading .eyebrow{display:none}.plan-heading h2{font-size:24px}
+  .plan-heading p:last-child{font-size:14px}.plan-actions{margin-top:16px}
+  .plan-actions button{flex:1;padding:11px 8px}
+  .plan-progress{padding:16px;margin-top:18px}.plan-progress h3{font-size:21px}
+  .progress-actions{display:grid;grid-template-columns:1fr}.progress-actions button{min-height:44px}
+  .plan-settings{display:grid;grid-template-columns:1fr;gap:16px;padding:12px}
+  .plan-settings>label:not(.check-label){width:100%;font-size:14px}
+  .plan-settings select{font-size:16px;width:100%}.plan-settings .check-label{max-width:none;font-size:16px}
+  #save-state{font-size:14px;max-width:none;margin:0}
+  #plan-summary{font-size:14px;padding:0 0 14px}
+  #target-outcomes{display:flex}
+  #timeline-help{display:none}
+  .semester-navigation{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:8px;margin-top:20px;align-items:center}
+  .semester-navigation button{min-height:46px;border:1px solid #ccd9ce;border-radius:6px;background:white;color:#284a32}
+  .semester-navigation select{min-height:46px;font-size:16px;padding:8px 4px}
+  .timeline{display:block;margin-top:20px}
+  .timeline>.semester:not(.mobile-active){display:none}
+  .semester h3{font-size:22px}.semester-subtitle{font-size:14px;line-height:1.6}
+  .drop-hint{display:none}.period{padding:14px;min-height:0}
+  .period-heading,.period-dates{font-size:14px;color:#506748}
+  .plan-course{padding:14px}.plan-course strong{font-size:18px}
+  .plan-course small,.plan-course span{font-size:14px;color:#506748}
+  .plan-course .card-action{display:block;margin-top:12px;font-weight:600;color:#236a47}
+  .plan-course[draggable=true]{cursor:pointer}
+  .empty-period{font-size:14px;color:#62765e}
+  .review-intro,.planning-note{font-size:14px}
+  .semester-choice select{font-size:16px}.programme-loads{grid-template-columns:1fr}
+  .details .detail-description,.details .empty-note{font-size:16px}.details .check-label{font-size:16px}
+  .details .requirement-kind,.details .source-link,.details summary{font-size:14px}
+  .details .primary-button{width:100%;font-size:16px}
+  .mobile-navigation{position:fixed;bottom:0;left:0;right:0;z-index:30;display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #cddcd4;box-shadow:0 -4px 20px #1027240d}
+  .mobile-navigation button{min-height:48px;border:0;border-radius:8px;background:white;color:#506748;font-size:14px;font-weight:600;padding:10px 4px}
+  .mobile-navigation button[aria-current=page]{background:#163f30;color:#fff}
+  .page-footer{font-size:12px;flex-direction:column}
+}
+@media print{.mobile-only,.planning-guide,.plan-options,.plan-progress,.card-action,#course-drawer{display:none!important}.study-plan{display:block!important}.timeline>.semester{display:block!important}}
+
+.target-placement-panel>summary{font-size:14px;line-height:1.5;padding:12px 0;cursor:pointer;color:#395b49}
+
+/* Keep the planning steps and degree essentials visible without disclosure clicks. */
+.quick-guide{padding:18px 22px;background:#e8f1eb;border:1px solid #c4d8cc;border-left:4px solid #397756;border-radius:10px;margin-bottom:8px}
+.quick-guide h2{font-size:18px;margin:0 0 14px}
+.quick-guide ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:0;padding-left:22px}
+.quick-guide li{padding-left:4px;color:#285a40;font-weight:650;line-height:1.5}
+.quick-guide a{color:#204d37;text-underline-offset:3px;font-size:16px}
+.quick-guide span{display:block;color:#506748;font-weight:400;font-size:14px;margin-top:3px}
+.degree-overview{margin-top:22px;border:2px solid #427857;border-radius:10px;padding:22px;background:#f3f8f1}
+.degree-overview h3{font-size:25px;letter-spacing:-.4px;margin:0;color:#204a32}
+.degree-intro,.degree-caveat{font-size:14px;line-height:1.6;color:#45614c;margin:10px 0 16px;max-width:75ch}
+.degree-essentials{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.degree-essential{background:white;border:1px solid #d1dfcf;border-radius:7px;padding:16px}
+.degree-essential>strong{font-size:25px;display:block;color:#244f32;margin-bottom:8px}
+.degree-essential>span{display:block;font-size:16px;line-height:1.5;font-weight:600}
+.degree-essential p{font-size:14px;line-height:1.6;margin:10px 0 0;color:#536950}
+.degree-caveat{margin:16px 0 0}
+.degree-overview .degree-requirements{margin-top:16px;padding-top:14px}
+.degree-overview .degree-requirements summary{cursor:pointer;line-height:1.5}
+@media(max-width:800px){
+  .quick-guide{padding:16px;margin-top:14px}.quick-guide ol{grid-template-columns:1fr;gap:10px}.quick-guide h2{font-size:18px;margin-bottom:10px}
+  .quick-guide span{margin:0}.quick-guide a{display:inline-block;min-height:24px}
+  .degree-overview{padding:16px}.degree-overview h3{font-size:24px}.degree-essentials{grid-template-columns:1fr;gap:10px}
+  .degree-essential{padding:14px}.degree-essential>strong{font-size:23px}
+}
+@media print{.quick-guide{display:none}.degree-overview{break-inside:avoid}}

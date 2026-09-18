@@ -11,11 +11,21 @@ An interactive prerequisite map and individual study planner for **Uppsala Unive
 3. Mark courses **already studied / requirement met** to stop expanding their prerequisites. Only mark a course when your prior study meets its role in the path; a completed-course condition still requires a pass.
 4. Choose a route for requirements with alternatives. Only the chosen route enters the graph. If no choice has been made, a completed alternative is preferred, otherwise the first option is used.
 5. Review the study plan. Choose **Unlimited** under Credits per period to remove the scheduling workload cap; the programme report still flags semesters above 30 credits. Change the starting academic year, credit limit or minimum plan window (2–4 academic years). **Provisional future offerings are included by default** and shown with dashed cards. Turn them off to restrict the view to published offerings. The timeline automatically extends when a prerequisite chain or rotation needs more years, searching up to eight academic years. Added semesters are labelled as beyond the standard two-year programme. Every target has a visible placement, completed status or explanation above the timeline; click a placed target to jump to its course card.
-6. Use **Choose semesters for your courses** above the timeline, or **Take this course in** in course details, to select a semester. Choices are saved and included in downloads. The degree project defaults to **semester 4**; choosing semester 3 for Mathematics is an explicit exception to review with the programme adviser. If a selected semester conflicts with offerings, prerequisites or the credit limit, the course stays visibly unplaced until you adjust the plan. Choose **Automatic** to clear a selection.
-7. Check programme fit above the timeline: each semester should total 30 credits, the four-semester programme 120 credits, and the degree project must occupy an allowed semester. Placements outside the outline and missing credits are flagged. Already-studied prerequisite markers are not automatically counted as degree credits.
+6. Use **Choose semesters for your courses** below the timeline, or **Change semester** in course details, to select a semester. Choices are saved and included in downloads. The degree project defaults to **semester 4**; choosing semester 3 for Mathematics is an explicit exception to review with the programme adviser. If a selected semester conflicts with offerings, prerequisites or the credit limit, the course stays visibly unplaced until you adjust the plan. Choose **Automatic** to clear a selection.
+7. Check the progress summary above the timeline and the detailed programme assessment below: each semester should total 30 credits, the four-semester programme 120 credits, and the degree project must occupy an allowed semester. Placements outside the outline and missing credits are flagged. Already-studied prerequisite markers are not automatically counted as degree credits.
 8. Review background studies and full entry conditions below the timeline. Download a JSON plan for your records.
 
-Selections are saved in this browser’s local storage. Nothing is sent to a backend. Downloaded plans are records; importing them is not currently supported.
+Selections are saved in this browser’s local storage. Nothing is sent to a backend. Use **Upload plan** to restore a downloaded JSON plan; its timeline is recalculated against the current catalogue.
+
+## On a phone
+
+At widths up to 800px, use the bottom navigation:
+
+- **Courses** offers search and track filters. Tap a course name to open its details in a drawer, or use **+** to add it directly.
+- **My plan** opens first, with planned credits and shortcuts to unresolved requirements. View one semester at a time using the selector or arrow buttons. Tap a course card and use **Change semester** to move it. Full-semester cards show both the total credits and the period workload.
+- **Prerequisites** shows the selected course’s prerequisite route and background-study checklists. Review alternative routes in course details. The interactive map is optional, with a readable minimum fit scale and panning.
+
+The drawer supports keyboard dismissal and returns focus to its opener. Desktop retains the catalogue, map and course-details workspace. Planning guidance, settings and detailed assessments can be expanded when needed.
 
 ## Run locally
 

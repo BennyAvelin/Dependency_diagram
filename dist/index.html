@@ -7,11 +7,16 @@
   <link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./styles.css">
   <script type="module" src="./app.js"></script>
 </head>
-<body>
+<body data-mobile-view="plan">
 <a class="skip" href="#search">Skip to course selection</a>
 <header class="header"><a class="brand" href="./"><span class="brand-mark" aria-hidden="true">CA</span> Course Atlas</a><span class="header-label">UPPSALA · MATHEMATICS</span><a class="sample" href="https://www.uu.se/en/study/outline?query=53757e7c-b967-4250-83db-911b32fbdfc8" target="_blank" rel="noreferrer">Official programme outline ↗</a></header>
 <main>
-  <div class="heading"><div><p class="eyebrow">MASTER’S PROGRAMME IN MATHEMATICS · 120 CREDITS</p><h1>Start with where you want to go.</h1><p>Choose your target courses. Trace the prerequisites. Build your study plan.</p></div><div class="totals"><strong id="total-courses">52</strong><span>courses to explore</span></div></div>
+  <div class="heading"><div><p class="eyebrow">MASTER’S PROGRAMME IN MATHEMATICS · 120 CREDITS</p><h1>Plan your mathematics studies.</h1><p>Choose your target courses. Trace the prerequisites. Build your study plan.</p></div><div class="totals"><strong id="total-courses">52</strong><span>courses to explore</span></div></div>
+  <section class="quick-guide" aria-labelledby="quick-guide-title">
+    <h2 id="quick-guide-title">How to plan your studies</h2>
+    <ol><li><a href="#search">Choose your courses</a><span>Use + to add targets.</span></li><li><a href="#plan-title">Adjust your semesters</a><span>Check prerequisites and workload.</span></li><li><a href="#degree-requirements">Check degree requirements</a><span>Complete the full 120-credit plan.</span></li></ol>
+  </section>
+  <details class="planning-guide"><summary>Detailed guidance &amp; important information</summary>
   <aside class="planning-disclaimer" aria-label="Planning disclaimer"><strong>Provided as is.</strong> Course Atlas is an independent planning aid, with no guarantee that its information or suggested plans are accurate, complete or up to date. It is your responsibility as a student to double-check prerequisites, entry requirements, course availability and programme requirements against the current <a href="https://www.uu.se/en/study/outline?query=53757e7c-b967-4250-83db-911b32fbdfc8" target="_blank" rel="noreferrer">official programme outline</a> and each course’s official syllabus before making study decisions. Links to official course information and syllabuses are available in the course details.</aside>
   <section class="usage-guide" aria-labelledby="guide-title">
     <h2 id="guide-title">How to build your plan</h2>
@@ -21,35 +26,60 @@
       <li><h3><span>Step 3</span> Review requirements and keep your plan</h3><p>Check the programme outline assessment and <a href="#review-summary">entry requirements</a>. Resolve any unplaced courses and verify details against the official sources. Your choices are saved in this browser; use <strong>Download plan</strong> to keep a copy and <strong>Upload plan</strong> to restore it later.</p></li>
     </ol>
   </section>
+  </details>
   <div id="error" role="alert" hidden></div>
   <div class="target-strip"><div><span class="section-label">YOUR TARGETS</span><div id="targets"></div></div><button id="clear" class="text-button">Clear targets</button></div>
-  <div class="workspace">
-    <aside class="catalogue" aria-label="Course catalogue"><div class="panel-heading"><h2>Choose courses</h2><span id="catalogue-count"></span></div>
+  <section id="prerequisites" class="mobile-only prerequisite-view" aria-labelledby="prerequisite-title">
+    <h2 id="prerequisite-title" tabindex="-1">Prerequisites</h2>
+    <label for="prerequisite-course">Explore a course</label><select id="prerequisite-course"></select>
+    <p class="review-intro">Follow the selected route below. Tick a course only when your prior studies meet its requirement.</p>
+    <button id="prerequisite-details" class="secondary-button">Course details &amp; alternative routes</button>
+    <div id="prerequisite-list"></div>
+    <button id="toggle-map" class="secondary-button" aria-expanded="false" aria-controls="map-area">Show interactive map</button>
+  </section>
+  <div class="workspace" id="workspace">
+    <aside class="catalogue" aria-label="Course catalogue"><div class="panel-heading"><h2 id="courses-title" tabindex="-1">Choose courses</h2><span id="catalogue-count"></span></div>
       <div class="catalogue-filters"><label for="search" class="sr-only">Search courses by name or code</label><input id="search" type="search" placeholder="Search name or code…"><label for="track" class="sr-only">Filter courses</label><select id="track"><option value="all">All programme courses</option><option value="Track: Mathematics">Mathematics (theoretical)</option><option value="Track: Applied Mathematics and Statistics">Applied maths & statistics</option><option value="Track: Financial Mathematics">Financial mathematics</option><option value="Bridging courses">Bridging courses</option></select></div>
       <p class="list-help">+ adds a target. Select a name for details.</p><div id="course-list" tabindex="-1"></div><p class="catalogue-note">Outline valid from Autumn 2026.<br>Second-year outline is preliminary.</p></aside>
-    <section class="diagram-panel" aria-label="Interactive prerequisite diagram"><div class="diagram-heading"><div><h2>Your prerequisite map</h2><p id="path-summary">Loading course requirements…</p></div><span class="map-hint">Drag to pan</span></div><div id="viewport" aria-label="Dependency diagram. Drag to pan; use the zoom controls below."><div id="world"><svg id="connections" aria-hidden="true"></svg><div id="nodes"></div></div><div id="map-empty" hidden>Add a target course to explore its prerequisites.</div></div><div class="map-footer"><div class="legend"><span><i class="target-color"></i>Target</span><span><i class="math"></i>Prerequisite</span><span><i class="done-color"></i>Already studied</span><span>╌ May be parallel</span></div><div class="zoom-controls" aria-label="Map controls"><button id="zoom-out" aria-label="Zoom out">−</button><output id="zoom-label" aria-label="Zoom level">100%</output><button id="zoom-in" aria-label="Zoom in">+</button><button id="fit">Fit</button></div></div><p class="map-scope">Arrows show the selected route through programme and bridging courses. Background studies and other entry requirements appear in the course details and plan review below.</p></section>
+    <div id="map-area"><section class="diagram-panel" aria-label="Interactive prerequisite diagram"><div class="diagram-heading"><div><h2>Your prerequisite map</h2><p id="path-summary">Loading course requirements…</p></div><span class="map-hint">Drag to pan</span></div><div id="viewport" aria-label="Dependency diagram. Drag to pan; use the zoom controls below."><div id="world"><svg id="connections" aria-hidden="true"></svg><div id="nodes"></div></div><div id="map-empty" hidden>Add a target course to explore its prerequisites.</div></div><div class="map-footer"><div class="legend"><span><i class="target-color"></i>Target</span><span><i class="math"></i>Prerequisite</span><span><i class="done-color"></i>Already studied</span><span>╌ May be parallel</span></div><div class="zoom-controls" aria-label="Map controls"><button id="zoom-out" aria-label="Zoom out">−</button><output id="zoom-label" aria-label="Zoom level">100%</output><button id="zoom-in" aria-label="Zoom in">+</button><button id="fit">Fit</button></div></div><p class="map-scope">Arrows show the selected route through programme and bridging courses. Background studies and other entry requirements appear in the course details and plan review below.</p></section>
+    </div>
     <aside id="details" class="details" aria-label="Selected course details"></aside>
   </div>
-  <section class="study-plan" aria-labelledby="plan-title"><div class="plan-heading"><div><p class="eyebrow">FROM TARGETS TO A TIMELINE</p><h2 id="plan-title">Your individual study plan</h2><p>A suggested order for your selected path. Add other courses to complete your programme.</p></div><div class="plan-actions"><button id="import" class="secondary-button" aria-describedby="import-help">Upload plan</button><button id="export" class="secondary-button">Download plan</button></div></div>
+  <section class="study-plan" aria-labelledby="plan-title"><div class="plan-heading"><div><p class="eyebrow">FROM TARGETS TO A TIMELINE</p><h2 id="plan-title" tabindex="-1">Your individual study plan</h2><p>A suggested order for your selected path. Add other courses to complete your programme.</p></div><div class="plan-actions"><button id="import" class="secondary-button" aria-describedby="import-help">Upload plan</button><button id="export" class="secondary-button">Download plan</button></div></div>
+    <section id="plan-progress" class="plan-progress" aria-label="Planning progress"></section>
     <input id="plan-file" type="file" accept=".json,application/json" hidden>
-    <p id="import-help" class="review-intro">Upload a previously downloaded plan to replace your current selections. The file stays in your browser.</p>
     <p id="import-status" class="review-intro" role="status"></p>
+    <details class="plan-options"><summary>Plan settings &amp; how scheduling works</summary>
+    <p id="import-help" class="review-intro">Upload a previously downloaded plan to replace your current selections. The file stays in your browser.</p>
     <div class="plan-settings"><label>Starting autumn <select id="start-year"><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option></select></label><label>Minimum plan window <select id="plan-years"><option value="2">2 academic years</option><option value="3">3 years · extended plan</option><option value="4">4 years · extended plan</option></select></label><label>Credits per period <select id="capacity"><option value="15">15 · full time</option><option value="10">10</option><option value="7.5">7.5 · half time</option><option value="20">20 · heavier load</option><option value="unlimited">Unlimited</option></select></label><label class="check-label"><input id="projections" type="checkbox"> Include projected future offerings</label><span id="save-state">Saved in this browser only</span></div>
     <p id="planning-mode" class="planning-mode" role="status"></p>
     <p class="plan-explainer">P1–P2: autumn. P3–P4: spring of the following calendar year. A course spanning periods appears in each with its workload split. Provisional offerings reuse outline or previous offering patterns and respect odd/even-year rules. Courses known only from a semester note appear under “Schedule not yet published”, with estimated workload. <a href="https://www.uu.se/en/students/faculty/science-and-technology/academic-year-periods-and-exams" target="_blank" rel="noreferrer">Official faculty periods ↗</a></p>
+    </details>
     <div id="plan-summary" role="status"></div>
-    <div id="target-outcomes" role="group" aria-label="Target course placements"></div>
+    <details class="target-placement-panel"><summary>Target placements &amp; status</summary><div id="target-outcomes" role="group" aria-label="Target course placements"></div></details>
     <p id="timeline-help" class="review-intro">Drag a course to a highlighted semester to move it. Teaching periods follow course offerings; prerequisites and workload are checked before moving. You can also use “Choose semesters for your courses” below.</p>
     <p id="timeline-feedback" class="timeline-feedback" role="status" aria-live="polite"></p>
+    <div class="mobile-only semester-navigation" aria-label="Choose a semester">
+      <button id="semester-previous" aria-label="Previous semester">←</button>
+      <label class="sr-only" for="visible-semester">Semester to view</label><select id="visible-semester"></select>
+      <button id="semester-next" aria-label="Next semester">→</button>
+    </div>
     <div id="timeline" class="timeline"></div>
+    <section id="degree-requirements" class="degree-overview" aria-labelledby="degree-title" tabindex="-1"></section>
     <div id="unplaced"></div>
-    <details id="semester-choice-panel" class="review-panel" open><summary>Choose semesters for your courses</summary><p class="review-intro">Choose a semester here or in course details. Choices are checked against offerings, prerequisites and workload. The degree project defaults to semester 4; Mathematics in semester 3 is exceptional.</p><div id="semester-choices"></div></details>
+    <details id="semester-choice-panel" class="review-panel"><summary>Choose semesters for your courses</summary><p class="review-intro">Choose a semester here or in course details. Choices are checked against offerings, prerequisites and workload. The degree project defaults to semester 4; Mathematics in semester 3 is exceptional.</p><div id="semester-choices"></div></details>
     <section id="programme-assessment" class="programme-assessment" aria-label="Programme outline check"></section>
-    <details class="review-panel" open><summary id="review-summary">Review background and entry requirements</summary><p class="review-intro">These studies sit outside the programme catalogue. Mark a requirement as met only if your previous studies satisfy the wording in the linked official course requirements. Your checks are planning notes, not an admission decision.</p><div id="background"></div><div id="eligibility"></div></details>
+    <details class="review-panel"><summary id="review-summary">Review background and entry requirements</summary><p class="review-intro">These studies sit outside the programme catalogue. Mark a requirement as met only if your previous studies satisfy the wording in the linked official course requirements. Your checks are planning notes, not an admission decision.</p><div id="background"></div><div id="eligibility"></div></details>
     <p class="planning-note">The planner uses a conservative, earliest-fit order. Prior participation is placed before a dependent course unless parallel study is explicitly allowed. It checks period credit loads, but not timetable clashes, admission decisions, degree rules or optimality. An unplaced course does not prove that no feasible plan exists.</p>
   </section>
+  <nav class="mobile-only mobile-navigation" aria-label="Study planner">
+    <button data-view="courses" aria-controls="workspace">Courses</button>
+    <button data-view="plan" aria-controls="plan-title" aria-current="page">My plan</button>
+    <button data-view="prerequisites" aria-controls="prerequisites">Prerequisites</button>
+  </nav>
   <footer class="page-footer"><span>Independent planning aid · Uppsala University source data checked <span id="checked-on"></span></span><span>Plans stay on this device. No account or analytics.</span></footer>
   <p id="announcement" class="sr-only" aria-live="polite"></p>
   <noscript><p>Enable JavaScript to explore the courses. The official programme outline is linked above.</p></noscript>
 </main>
+<dialog id="course-drawer" aria-label="Course details"><div class="drawer-bar"><span>Course details</span><button id="close-drawer" autofocus>Done</button></div></dialog>
 </body></html>
